@@ -98,9 +98,13 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
               placeholder="e.g. Crocin 650"
               value={name}
               onIonInput={(event) => setName(event.detail.value ?? "")}
-              errorText={errors.name}
             />
           </IonItem>
+          {errors.name && (
+            <IonNote color="danger" className="ion-padding-start">
+              {errors.name}
+            </IonNote>
+          )}
 
           <IonItem>
             <IonInput
