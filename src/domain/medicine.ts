@@ -21,9 +21,10 @@ export interface Medicine {
 }
 
 export type MedicineDraft = Pick<Medicine, "name" | "formula" | "type" | "times">;
-export type MedicineErrors = Partial<Record<"name" | "time", string>>;
 
-const validateDraft = (draft: MedicineDraft) => {
+export type MedicineErrors = Partial<Record<"name" | "times", string>>;
+
+export function validateDraft(draft: MedicineDraft): MedicineErrors {
   const errors: MedicineErrors = {};
 
   if (draft.name.trim() === "") {
@@ -31,31 +32,32 @@ const validateDraft = (draft: MedicineDraft) => {
   }
 
   if (draft.times.length === 0 || draft.times.some((time) => time === "")) {
-    errors.time = "Every dose needs a time.";
+    errors.times = "Every dose needs a time";
   } else if (new Set(draft.times).size !== draft.times.length) {
-    errors.time = "Two doses cannot share the same time.";
+    errors.times = "Two doses cannot share the same time";
   }
 
   return errors;
-};
+}
 
-const createMedicine = (draft: MedicineDraft, now: Date = new Date()): Medicine => {
+export function createMedicine(draft: MedicineDraft, now: Date = new Date()): Medicine {
   const stamp = now.toISOString();
   return { id: crypto.randomUUID(), ...normalise(draft), createdAt: stamp, updatedAt: stamp };
-};
+}
 
-const updateMedicine = (existing: MedicineDraft, draft: MedicineDraft, now: Date = new Date()) => {
-  const stamp = now.toISOString();
-  return { ...existing, ...normalise(draft), updatedAt: stamp };
-};
+export function updateMedicine(
+  existing: Medicine,
+  draft: MedicineDraft,
+  now: Date = new Date(),
+): Medicine {
+  return { ...existing, ...normalise(draft), updatedAt: now.toISOString() };
+}
 
-const normalise = (draft: MedicineDraft): MedicineDraft => {
+function normalise(draft: MedicineDraft): MedicineDraft {
   return {
     name: draft.name.trim(),
     formula: draft.formula.trim(),
     type: draft.type,
     times: [...draft.times].sort(),
   };
-};
-
-export default { validateDraft, createMedicine, updateMedicine, normalise };
+}
