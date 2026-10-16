@@ -8,19 +8,18 @@ export interface MedicineRepository {
 
 const STORAGE_KEY = "medtracker.medicines.v1";
 
-const readAll = (): Medicine[] => {
+function readAll(): Medicine[] {
   const raw = localStorage.getItem(STORAGE_KEY);
   return raw ? (JSON.parse(raw) as Medicine[]) : [];
-};
+}
 
-const writeAll = (medicines: Medicine[]): void => {
+function writeAll(medicines: Medicine[]): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(medicines));
-};
-
-export default { readAll, writeAll };
+}
 
 export const medicineRepository: MedicineRepository = {
   list: readAll,
+
   save(medicine) {
     const medicines = readAll();
     const index = medicines.findIndex((item) => item.id === medicine.id);
@@ -31,6 +30,7 @@ export const medicineRepository: MedicineRepository = {
     }
     writeAll(medicines);
   },
+
   remove(id) {
     writeAll(readAll().filter((item) => item.id !== id));
   },
