@@ -2,12 +2,14 @@ import {
   IonButton,
   IonButtons,
   IonContent,
+  IonDatetime,
   IonHeader,
   IonIcon,
   IonInput,
   IonItem,
   IonLabel,
   IonList,
+  IonModal,
   IonNote,
   IonSegment,
   IonSegmentButton,
@@ -16,17 +18,21 @@ import {
   IonTitle,
   IonToolbar,
 } from "@ionic/react";
-import { addOutline, removeCircleOutline } from "ionicons/icons";
+import { addOutline } from "ionicons/icons";
 import { useState } from "react";
+import { defaultAmount } from "../../domain/doseUnits";
 import {
   MEDICINE_TYPES,
   validateDraft,
+  type Dose,
   type Medicine,
   type MedicineDraft,
   type MedicineErrors,
   type MedicineType,
 } from "../../domain/medicine";
-import { DOSE_PRESETS } from "../../domain/presets";
+import { DOSE_PRESETS, NEW_DOSE_TIME, dosesForPreset, resizeDoses } from "../../domain/presets";
+import { toClockTime } from "../../domain/time";
+import DoseRow from "./DoseRow";
 
 interface MedicineFormProps {
   initial?: Medicine;
@@ -35,37 +41,51 @@ interface MedicineFormProps {
   onDelete?: () => void;
 }
 
+const PICKER_DATE = "2000-01-01";
+
 export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: MedicineFormProps) {
+  const initialType: MedicineType = initial?.type ?? "Tablet";
+
   const [name, setName] = useState(initial?.name ?? "");
   const [formula, setFormula] = useState(initial?.formula ?? "");
-  const [type, setType] = useState<MedicineType>(initial?.type ?? "Tablet");
-  const [times, setTimes] = useState<string[]>(initial?.times ?? [...DOSE_PRESETS[0].times]);
+  const [type, setType] = useState<MedicineType>(initialType);
+  const [doses, setDoses] = useState<Dose[]>(initial?.doses ?? dosesForPreset(1, initialType));
   const [errors, setErrors] = useState<MedicineErrors>({});
+  const [pickingIndex, setPickingIndex] = useState<number | null>(null);
 
-  const presetValue = String(times.length);
   const isEditing = initial !== undefined;
+  const pickedTime = pickingIndex !== null ? doses[pickingIndex]?.time : undefined;
+
+  function changeType(next: MedicineType) {
+    setType(next);
+    setDoses(doses.map((dose) => ({ ...dose, amount: defaultAmount(next) })));
+  }
 
   function applyPreset(value: string) {
-    const preset = DOSE_PRESETS[Number(value) - 1];
-    if (preset) {
-      setTimes([...preset.times]);
+    setDoses(resizeDoses(doses, Number(value), type));
+  }
+
+  function updateDose(index: number, changes: Partial<Dose>) {
+    setDoses(doses.map((dose, position) => (position === index ? { ...dose, ...changes } : dose)));
+  }
+
+  function removeDose(index: number) {
+    setDoses(doses.filter((_, position) => position !== index));
+  }
+
+  function addDose() {
+    setDoses([...doses, { time: NEW_DOSE_TIME, amount: defaultAmount(type) }]);
+  }
+
+  function handleTimeChange(datetimeValue: string) {
+    const clock = toClockTime(datetimeValue);
+    if (pickingIndex !== null && clock) {
+      updateDose(pickingIndex, { time: clock });
     }
   }
 
-  function updateTime(index: number, value: string) {
-    setTimes(times.map((time, position) => (position === index ? value : time)));
-  }
-
-  function removeTime(index: number) {
-    setTimes(times.filter((_, position) => position !== index));
-  }
-
-  function addTime() {
-    setTimes([...times, "12:00"]);
-  }
-
   function handleSubmit() {
-    const draft: MedicineDraft = { name, formula, type, times };
+    const draft: MedicineDraft = { name, formula, type, doses };
     const found = validateDraft(draft);
     setErrors(found);
     if (Object.keys(found).length === 0) {
@@ -94,6 +114,7 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
           <IonItem>
             <IonInput
               label="Name"
+              name="medicine-name"
               labelPlacement="stacked"
               placeholder="e.g. Crocin 650"
               value={name}
@@ -109,6 +130,7 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
           <IonItem>
             <IonInput
               label="Formula (optional)"
+              name="medicine-formula"
               labelPlacement="stacked"
               placeholder="e.g. Paracetamol 650mg"
               value={formula}
@@ -119,9 +141,10 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
           <IonItem>
             <IonSelect
               label="Type"
+              name="medicine-type"
               labelPlacement="stacked"
               value={type}
-              onIonChange={(event) => setType(event.detail.value as MedicineType)}
+              onIonChange={(event) => changeType(event.detail.value as MedicineType)}
             >
               {MEDICINE_TYPES.map((option) => (
                 <IonSelectOption key={option} value={option}>
@@ -134,7 +157,7 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
 
         <div className="ion-padding">
           <IonSegment
-            value={presetValue}
+            value={String(doses.length)}
             onIonChange={(event) => applyPreset(String(event.detail.value))}
           >
             {DOSE_PRESETS.map((preset, index) => (
@@ -146,34 +169,28 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
         </div>
 
         <IonList>
-          {times.map((time, index) => (
-            <IonItem key={index}>
-              <IonInput
-                type="time"
-                aria-label={`Dose ${index + 1} time`}
-                value={time}
-                onIonInput={(event) => updateTime(index, event.detail.value ?? "")}
-              />
-              {times.length > 1 && (
-                <IonButton
-                  fill="clear"
-                  slot="end"
-                  aria-label="Remove time"
-                  onClick={() => removeTime(index)}
-                >
-                  <IonIcon icon={removeCircleOutline} />
-                </IonButton>
-              )}
-            </IonItem>
+          {doses.map((dose, index) => (
+            <DoseRow
+              key={index}
+              position={index + 1}
+              dose={dose}
+              type={type}
+              canRemove={doses.length > 1}
+              onLabelChange={(label) => updateDose(index, { label })}
+              onPickTime={() => setPickingIndex(index)}
+              onAmountChange={(amount) => updateDose(index, { amount })}
+              onRemove={() => removeDose(index)}
+            />
           ))}
         </IonList>
 
         <div className="ion-padding">
-          <IonButton fill="clear" onClick={addTime}>
+          <IonButton fill="clear" onClick={addDose}>
             <IonIcon slot="start" icon={addOutline} />
-            Add time
+            Add dose
           </IonButton>
           {errors.times && <IonNote color="danger">{errors.times}</IonNote>}
+          {errors.amounts && <IonNote color="danger">{errors.amounts}</IonNote>}
         </div>
 
         {onDelete && (
@@ -183,6 +200,27 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
             </IonButton>
           </div>
         )}
+
+        <IonModal isOpen={pickingIndex !== null} onDidDismiss={() => setPickingIndex(null)}>
+          <IonHeader>
+            <IonToolbar>
+              <IonTitle>Dose time</IonTitle>
+              <IonButtons slot="end">
+                <IonButton strong onClick={() => setPickingIndex(null)}>
+                  Done
+                </IonButton>
+              </IonButtons>
+            </IonToolbar>
+          </IonHeader>
+          <IonContent>
+            <IonDatetime
+              presentation="time"
+              preferWheel
+              value={pickedTime ? `${PICKER_DATE}T${pickedTime}` : undefined}
+              onIonChange={(event) => handleTimeChange(String(event.detail.value ?? ""))}
+            />
+          </IonContent>
+        </IonModal>
       </IonContent>
     </>
   );

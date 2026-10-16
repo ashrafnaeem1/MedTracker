@@ -1,7 +1,3 @@
-import { useState } from "react";
-import type { Medicine, MedicineDraft } from "../../domain/medicine";
-import { medicineRepository } from "../../storage/medicineRepository";
-import { createMedicine, updateMedicine } from "../../domain/medicine";
 import {
   IonAlert,
   IonContent,
@@ -18,10 +14,21 @@ import {
   IonToolbar,
 } from "@ionic/react";
 import { addOutline } from "ionicons/icons";
+import { useState } from "react";
+import {
+  createMedicine,
+  updateMedicine,
+  type Medicine,
+  type MedicineDraft,
+} from "../../domain/medicine";
+import { formatDose } from "../../domain/doseUnits";
+import { doseLabel } from "../../domain/doseLabel";
+import { formatTime } from "../../domain/time";
+import { medicineRepository } from "../../storage/medicineRepository";
 import MedicineForm from "./MedicineForm";
 import { useMedicines } from "./useMedicines";
 
-const MedicinesPage = () => {
+export default function MedicinesPage() {
   const { items, refresh } = useMedicines();
   const [editing, setEditing] = useState<Medicine | null>(null);
   const [isFormOpen, setIsFormOpen] = useState(false);
@@ -68,12 +75,17 @@ const MedicinesPage = () => {
           <p className="ion-padding">No medicines yet. Tap + to add one.</p>
         ) : (
           <IonList>
-            {items.map((medicine: Medicine) => (
+            {items.map((medicine) => (
               <IonItem key={medicine.id} button detail onClick={() => openEdit(medicine)}>
                 <IonLabel>
                   <h2>{medicine.name}</h2>
                   <p>{medicine.formula || medicine.type}</p>
-                  <p>{medicine.times.join(" . ")}</p>
+                  {medicine.doses.map((dose, index) => (
+                    <p key={dose.time}>
+                      {doseLabel(dose, index + 1)} · {formatTime(dose.time)}:{" "}
+                      {formatDose(dose.amount, medicine.type)}
+                    </p>
+                  ))}
                 </IonLabel>
               </IonItem>
             ))}
@@ -109,6 +121,4 @@ const MedicinesPage = () => {
       </IonContent>
     </IonPage>
   );
-};
-
-export default MedicinesPage;
+}
