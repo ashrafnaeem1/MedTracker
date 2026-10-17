@@ -1,0 +1,5 @@
+.dose-name-input::part(native) {
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}

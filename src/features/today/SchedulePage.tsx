@@ -12,7 +12,7 @@ import {
 import { todayOutline } from "ionicons/icons";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { requestEdit } from "../../shared/pendingEdit";
+import { requestAdd, requestEdit } from "../../shared/pendingEdit";
 import { toIsoDate } from "../../domain/date";
 import { useNow } from "../../shared/useNow";
 import DateStrip from "./DateStrip";
@@ -48,6 +48,10 @@ export default function SchedulePage() {
           onUndo={undo}
           onEdit={(medicineId) => {
             requestEdit(medicineId);
+            navigate("/medicines");
+          }}
+          onAdd={() => {
+            requestAdd();
             navigate("/medicines");
           }}
         />

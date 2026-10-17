@@ -1,4 +1,5 @@
 import {
+  IonAlert,
   IonButton,
   IonButtons,
   IonContent,
@@ -7,8 +8,8 @@ import {
   IonIcon,
   IonInput,
   IonItem,
-  IonLabel,
   IonList,
+  IonListHeader,
   IonModal,
   IonNote,
   IonSegment,
@@ -17,7 +18,6 @@ import {
   IonSelectOption,
   IonTitle,
   IonToolbar,
-  IonAlert,
 } from "@ionic/react";
 import { addOutline } from "ionicons/icons";
 import { useRef, useState } from "react";
@@ -46,6 +46,8 @@ interface MedicineFormProps {
 }
 
 const TIME_PICKER_ANCHOR_DATE = "2000-01-01";
+
+const SECTION_PADDING = "8px 16px 0";
 
 export default function MedicineForm({
   initial,
@@ -78,6 +80,7 @@ export default function MedicineForm({
   if (errors.times) {
     missingLabels.push(doses.length === 0 ? "Schedule" : "Dose times");
   }
+
   const pickerValue =
     pickerDraft ?? (pickingIndex !== null ? doses[pickingIndex]?.time : undefined);
 
@@ -161,20 +164,21 @@ export default function MedicineForm({
       <IonContent>
         {missingLabels.length > 0 && (
           <IonItem color="danger" lines="none">
-            <IonLabel className="ion-text-wrap">
+            <IonNote color="light" className="ion-text-wrap" style={{ fontWeight: 600 }}>
               Missing required: {missingLabels.join(", ")}
-            </IonLabel>
+            </IonNote>
           </IonItem>
         )}
 
+        <IonListHeader>Medicine</IonListHeader>
         <IonList>
           <IonItem>
             <IonInput
               label={markRequired("Name")}
               ref={nameInput}
-              name="medicine-name"
               labelPlacement="stacked"
               placeholder="e.g. Crocin 650"
+              name="medicine-name"
               value={name}
               onIonInput={(event) => setName(event.detail.value ?? "")}
             />
@@ -188,9 +192,9 @@ export default function MedicineForm({
           <IonItem>
             <IonInput
               label="Formula (optional)"
-              name="medicine-formula"
               labelPlacement="stacked"
               placeholder="e.g. Paracetamol 650mg"
+              name="medicine-formula"
               value={formula}
               onIonInput={(event) => setFormula(event.detail.value ?? "")}
             />
@@ -199,8 +203,8 @@ export default function MedicineForm({
           <IonItem>
             <IonSelect
               label="Type"
-              name="medicine-type"
               labelPlacement="stacked"
+              name="medicine-type"
               value={type}
               onIonChange={(event) => changeType(event.detail.value as MedicineType)}
             >
@@ -213,38 +217,31 @@ export default function MedicineForm({
           </IonItem>
         </IonList>
 
-        <div className="ion-padding">
+        <IonListHeader>How often</IonListHeader>
+        <div style={{ padding: SECTION_PADDING }}>
           <IonSegment
             value={doses.length > 0 ? String(doses.length) : undefined}
             onIonChange={(event) => applyPreset(String(event.detail.value))}
           >
             {DOSE_PRESETS.map((preset, index) => (
               <IonSegmentButton key={preset.label} value={String(index + 1)}>
-                <IonLabel>{preset.label}</IonLabel>
+                {preset.label}
               </IonSegmentButton>
             ))}
           </IonSegment>
+          {errors.times && (
+            <IonNote color="danger" style={{ display: "block", paddingTop: 8 }}>
+              {errors.times}
+            </IonNote>
+          )}
+          {errors.amounts && (
+            <IonNote color="danger" style={{ display: "block", paddingTop: 8 }}>
+              {errors.amounts}
+            </IonNote>
+          )}
         </div>
 
-        {errors.times && (
-          <IonNote
-            color="danger"
-            className="ion-padding-start"
-            style={{ display: "block", paddingTop: 8 }}
-          >
-            {errors.times}
-          </IonNote>
-        )}
-        {errors.amounts && (
-          <IonNote
-            color="danger"
-            className="ion-padding-start"
-            style={{ display: "block", paddingTop: 8 }}
-          >
-            {errors.amounts}
-          </IonNote>
-        )}
-
+        <IonListHeader>Doses</IonListHeader>
         <IonList>
           {doses.map((dose, index) => (
             <DoseRow
@@ -261,16 +258,22 @@ export default function MedicineForm({
           ))}
         </IonList>
 
-        <div className="ion-padding">
-          <IonButton fill="clear" onClick={addDose}>
-            <IonIcon slot="start" icon={addOutline} />
+        <div style={{ padding: SECTION_PADDING }}>
+          <IonButton fill="clear" onClick={addDose} style={{ minHeight: 44 }}>
+            <IonIcon slot="start" icon={addOutline} aria-hidden="true" />
             Add dose
           </IonButton>
         </div>
 
         {onDelete && (
-          <div className="ion-padding">
-            <IonButton expand="block" color="danger" fill="clear" onClick={onDelete}>
+          <div style={{ padding: "24px 16px" }}>
+            <IonButton
+              expand="block"
+              color="danger"
+              fill="outline"
+              onClick={onDelete}
+              style={{ minHeight: 44 }}
+            >
               Delete medicine
             </IonButton>
           </div>
