@@ -38,7 +38,9 @@ export function validateDraft(draft: MedicineDraft): MedicineErrors {
   }
 
   const times = draft.doses.map((dose) => dose.time);
-  if (times.length === 0 || times.some((time) => time === "")) {
+  if (times.length === 0) {
+    errors.times = "Choose how often to take it";
+  } else if (times.some((time) => time === "")) {
     errors.times = "Every dose needs a time";
   } else if (new Set(times).size !== times.length) {
     errors.times = "Two doses cannot share the same time";

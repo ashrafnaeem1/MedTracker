@@ -21,7 +21,7 @@ import {
   type Medicine,
   type MedicineDraft,
 } from "../../domain/medicine";
-import { formatDose } from "../../domain/doseUnits";
+import { formatDose, hasQuantity } from "../../domain/doseUnits";
 import { doseLabel } from "../../domain/doseLabel";
 import { formatTime } from "../../domain/time";
 import { medicineRepository } from "../../storage/medicineRepository";
@@ -82,8 +82,8 @@ export default function MedicinesPage() {
                   <p>{medicine.formula || medicine.type}</p>
                   {medicine.doses.map((dose, index) => (
                     <p key={dose.time}>
-                      {doseLabel(dose, index + 1)} · {formatTime(dose.time)}:{" "}
-                      {formatDose(dose.amount, medicine.type)}
+                      {doseLabel(dose, index + 1)} · {formatTime(dose.time)}
+                      {hasQuantity(medicine.type) && `: ${formatDose(dose.amount, medicine.type)}`}
                     </p>
                   ))}
                 </IonLabel>

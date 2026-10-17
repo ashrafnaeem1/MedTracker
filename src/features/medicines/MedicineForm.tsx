@@ -30,8 +30,9 @@ import {
   type MedicineErrors,
   type MedicineType,
 } from "../../domain/medicine";
-import { DOSE_PRESETS, NEW_DOSE_TIME, dosesForPreset, resizeDoses } from "../../domain/presets";
+import { DOSE_PRESETS, resizeDoses } from "../../domain/presets";
 import { toClockTime } from "../../domain/time";
+import { markRequired } from "../../shared/requiredMark";
 import DoseRow from "./DoseRow";
 
 interface MedicineFormProps {
@@ -41,7 +42,7 @@ interface MedicineFormProps {
   onDelete?: () => void;
 }
 
-const PICKER_DATE = "2000-01-01";
+const TIME_PICKER_ANCHOR_DATE = "2000-01-01";
 
 export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: MedicineFormProps) {
   const initialType: MedicineType = initial?.type ?? "Tablet";
@@ -49,12 +50,25 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
   const [name, setName] = useState(initial?.name ?? "");
   const [formula, setFormula] = useState(initial?.formula ?? "");
   const [type, setType] = useState<MedicineType>(initialType);
-  const [doses, setDoses] = useState<Dose[]>(initial?.doses ?? dosesForPreset(1, initialType));
-  const [errors, setErrors] = useState<MedicineErrors>({});
+  const [doses, setDoses] = useState<Dose[]>(initial?.doses ?? resizeDoses([], 1, initialType));
+  const [submitted, setSubmitted] = useState(false);
   const [pickingIndex, setPickingIndex] = useState<number | null>(null);
+  const [pickerDraft, setPickerDraft] = useState<string | null>(null);
 
   const isEditing = initial !== undefined;
-  const pickedTime = pickingIndex !== null ? doses[pickingIndex]?.time : undefined;
+
+  const draft: MedicineDraft = { name, formula, type, doses };
+  const errors: MedicineErrors = submitted ? validateDraft(draft) : {};
+
+  const missingLabels: string[] = [];
+  if (errors.name) {
+    missingLabels.push("Name");
+  }
+  if (errors.times) {
+    missingLabels.push(doses.length === 0 ? "Schedule" : "Dose times");
+  }
+  const pickerValue =
+    pickerDraft ?? (pickingIndex !== null ? doses[pickingIndex]?.time : undefined);
 
   function changeType(next: MedicineType) {
     setType(next);
@@ -63,6 +77,33 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
 
   function applyPreset(value: string) {
     setDoses(resizeDoses(doses, Number(value), type));
+  }
+
+  function openPicker(index: number) {
+    setPickerDraft(null);
+    setPickingIndex(index);
+  }
+
+  function advancePicker() {
+    if (pickingIndex === null) {
+      return;
+    }
+    const wasUnset = doses[pickingIndex]?.time === "";
+    const updated =
+      pickerDraft === null
+        ? doses
+        : doses.map((dose, position) =>
+            position === pickingIndex ? { ...dose, time: pickerDraft } : dose,
+          );
+    setDoses(updated);
+    const next = wasUnset
+      ? updated.findIndex((dose, position) => position > pickingIndex && dose.time === "")
+      : -1;
+    if (next === -1) {
+      setPickingIndex(null);
+    } else {
+      openPicker(next);
+    }
   }
 
   function updateDose(index: number, changes: Partial<Dose>) {
@@ -74,21 +115,20 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
   }
 
   function addDose() {
-    setDoses([...doses, { time: NEW_DOSE_TIME, amount: defaultAmount(type) }]);
+    setDoses([...doses, { time: "", amount: defaultAmount(type) }]);
+    openPicker(doses.length);
   }
 
   function handleTimeChange(datetimeValue: string) {
     const clock = toClockTime(datetimeValue);
-    if (pickingIndex !== null && clock) {
-      updateDose(pickingIndex, { time: clock });
+    if (clock) {
+      setPickerDraft(clock);
     }
   }
 
   function handleSubmit() {
-    const draft: MedicineDraft = { name, formula, type, doses };
-    const found = validateDraft(draft);
-    setErrors(found);
-    if (Object.keys(found).length === 0) {
+    setSubmitted(true);
+    if (Object.keys(validateDraft(draft)).length === 0) {
       onSubmit(draft);
     }
   }
@@ -110,10 +150,18 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
       </IonHeader>
 
       <IonContent>
+        {missingLabels.length > 0 && (
+          <IonItem color="danger" lines="none">
+            <IonLabel className="ion-text-wrap">
+              Missing required: {missingLabels.join(", ")}
+            </IonLabel>
+          </IonItem>
+        )}
+
         <IonList>
           <IonItem>
             <IonInput
-              label="Name"
+              label={markRequired("Name")}
               name="medicine-name"
               labelPlacement="stacked"
               placeholder="e.g. Crocin 650"
@@ -157,7 +205,7 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
 
         <div className="ion-padding">
           <IonSegment
-            value={String(doses.length)}
+            value={doses.length > 0 ? String(doses.length) : undefined}
             onIonChange={(event) => applyPreset(String(event.detail.value))}
           >
             {DOSE_PRESETS.map((preset, index) => (
@@ -168,6 +216,25 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
           </IonSegment>
         </div>
 
+        {errors.times && (
+          <IonNote
+            color="danger"
+            className="ion-padding-start"
+            style={{ display: "block", paddingTop: 8 }}
+          >
+            {errors.times}
+          </IonNote>
+        )}
+        {errors.amounts && (
+          <IonNote
+            color="danger"
+            className="ion-padding-start"
+            style={{ display: "block", paddingTop: 8 }}
+          >
+            {errors.amounts}
+          </IonNote>
+        )}
+
         <IonList>
           {doses.map((dose, index) => (
             <DoseRow
@@ -177,7 +244,7 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
               type={type}
               canRemove={doses.length > 1}
               onLabelChange={(label) => updateDose(index, { label })}
-              onPickTime={() => setPickingIndex(index)}
+              onPickTime={() => openPicker(index)}
               onAmountChange={(amount) => updateDose(index, { amount })}
               onRemove={() => removeDose(index)}
             />
@@ -189,8 +256,6 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
             <IonIcon slot="start" icon={addOutline} />
             Add dose
           </IonButton>
-          {errors.times && <IonNote color="danger">{errors.times}</IonNote>}
-          {errors.amounts && <IonNote color="danger">{errors.amounts}</IonNote>}
         </div>
 
         {onDelete && (
@@ -206,8 +271,8 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
             <IonToolbar>
               <IonTitle>Dose time</IonTitle>
               <IonButtons slot="end">
-                <IonButton strong onClick={() => setPickingIndex(null)}>
-                  Done
+                <IonButton strong onClick={advancePicker}>
+                  {pickerDraft === null ? "Skip" : "Done"}
                 </IonButton>
               </IonButtons>
             </IonToolbar>
@@ -216,7 +281,7 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
             <IonDatetime
               presentation="time"
               preferWheel
-              value={pickedTime ? `${PICKER_DATE}T${pickedTime}` : undefined}
+              value={pickerValue ? `${TIME_PICKER_ANCHOR_DATE}T${pickerValue}` : undefined}
               onIonChange={(event) => handleTimeChange(String(event.detail.value ?? ""))}
             />
           </IonContent>

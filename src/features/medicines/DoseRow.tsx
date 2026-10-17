@@ -1,5 +1,7 @@
 import { IonButton, IonIcon, IonInput, IonItem, IonLabel } from "@ionic/react";
 import { removeCircleOutline } from "ionicons/icons";
+import { hasQuantity } from "../../domain/doseUnits";
+import { markRequired } from "../../shared/requiredMark";
 import type { Dose, MedicineType } from "../../domain/medicine";
 import { defaultDoseLabel } from "../../domain/doseLabel";
 import { formatTime } from "../../domain/time";
@@ -38,7 +40,7 @@ export default function DoseRow({
             onIonInput={(event) => onLabelChange(event.detail.value ?? "")}
           />
           <IonButton fill="clear" onClick={onPickTime}>
-            {formatTime(dose.time)}
+            {dose.time ? formatTime(dose.time) : markRequired("Set time")}
           </IonButton>
           {canRemove && (
             <IonButton fill="clear" aria-label="Remove dose" onClick={onRemove}>
@@ -46,15 +48,17 @@ export default function DoseRow({
             </IonButton>
           )}
         </div>
-        <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-          <IonLabel color="medium">Quantity</IonLabel>
-          <QuantityStepper
-            fieldId={`dose-${position}-quantity`}
-            type={type}
-            amount={dose.amount}
-            onChange={onAmountChange}
-          />
-        </div>
+        {hasQuantity(type) && (
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            <IonLabel color="medium">Quantity</IonLabel>
+            <QuantityStepper
+              fieldId={`dose-${position}-quantity`}
+              type={type}
+              amount={dose.amount}
+              onChange={onAmountChange}
+            />
+          </div>
+        )}
       </div>
     </IonItem>
   );

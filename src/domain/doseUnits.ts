@@ -28,6 +28,10 @@ export function unitLabel(type: MedicineType): string {
   return UNIT_RULES[type].label;
 }
 
+export function hasQuantity(type: MedicineType): boolean {
+  return unitLabel(type) !== "";
+}
+
 export function formatDose(amount: number, type: MedicineType): string {
   return [String(amount), unitLabel(type)].filter((part) => part !== "").join(" ");
 }
