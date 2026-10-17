@@ -19,7 +19,7 @@ import {
 import { addOutline, medkitOutline } from "ionicons/icons";
 import { useState, type CSSProperties } from "react";
 import { doseLabel } from "../../domain/doseLabel";
-import { defaultAmount, formatDose, hasQuantity } from "../../domain/doseUnits";
+import { formatDose, hasQuantity } from "../../domain/doseUnits";
 import {
   createMedicine,
   updateMedicine,
@@ -43,24 +43,10 @@ const ROW_STYLE: CSSProperties = {
   "--inner-border-width": "0",
 } as CSSProperties;
 
-const QUANTITY_PILL: CSSProperties = {
-  display: "inline-flex",
-  alignItems: "center",
-  padding: "2px 8px",
-  borderRadius: 999,
-  border: "1px solid #d1d5db",
-  background: "#f3f4f6",
-  color: "#374151",
-  fontSize: 13,
-  fontWeight: 600,
-  whiteSpace: "nowrap",
-};
-
 function DoseLines({ medicine }: { medicine: Medicine }) {
   return (
     <>
       {medicine.doses.map((dose, index) => {
-        const isDefault = dose.amount === defaultAmount(medicine.type);
         return (
           <p
             key={dose.time}
@@ -77,12 +63,7 @@ function DoseLines({ medicine }: { medicine: Medicine }) {
             <span>
               {doseLabel(dose, index + 1)} · {formatTime(dose.time)}
             </span>
-            {hasQuantity(medicine.type) &&
-              (isDefault ? (
-                <span>{formatDose(dose.amount, medicine.type)}</span>
-              ) : (
-                <span style={QUANTITY_PILL}>{formatDose(dose.amount, medicine.type)}</span>
-              ))}
+            {hasQuantity(medicine.type) && <span>{formatDose(dose.amount, medicine.type)}</span>}
           </p>
         );
       })}
