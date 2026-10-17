@@ -14,3 +14,9 @@ export function toClockTime(datetimeValue: string): string | null {
   const match = TIME_PATTERN.exec(datetimeValue);
   return match ? `${match[1]}:${match[2]}` : null;
 }
+
+const instantFormat = new Intl.DateTimeFormat(undefined, { hour: "numeric", minute: "2-digit" });
+
+export function formatInstant(iso: string): string {
+  return instantFormat.format(new Date(iso));
+}

@@ -76,3 +76,12 @@ function normalise(draft: MedicineDraft): MedicineDraft {
       .map((dose) => ({ ...dose, label: dose.label?.trim() || undefined })),
   };
 }
+
+export function findDuplicateName(
+  name: string,
+  medicines: Medicine[],
+  ignoreId?: string,
+): Medicine | undefined {
+  const key = name.trim().toLowerCase();
+  return medicines.find((item) => item.id !== ignoreId && item.name.trim().toLowerCase() === key);
+}

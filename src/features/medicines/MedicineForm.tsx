@@ -17,12 +17,14 @@ import {
   IonSelectOption,
   IonTitle,
   IonToolbar,
+  IonAlert,
 } from "@ionic/react";
 import { addOutline } from "ionicons/icons";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { defaultAmount } from "../../domain/doseUnits";
 import {
   MEDICINE_TYPES,
+  findDuplicateName,
   validateDraft,
   type Dose,
   type Medicine,
@@ -37,6 +39,7 @@ import DoseRow from "./DoseRow";
 
 interface MedicineFormProps {
   initial?: Medicine;
+  existing: Medicine[];
   onSubmit: (draft: MedicineDraft) => void;
   onCancel: () => void;
   onDelete?: () => void;
@@ -44,7 +47,13 @@ interface MedicineFormProps {
 
 const TIME_PICKER_ANCHOR_DATE = "2000-01-01";
 
-export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: MedicineFormProps) {
+export default function MedicineForm({
+  initial,
+  existing,
+  onSubmit,
+  onCancel,
+  onDelete,
+}: MedicineFormProps) {
   const initialType: MedicineType = initial?.type ?? "Tablet";
 
   const [name, setName] = useState(initial?.name ?? "");
@@ -52,6 +61,8 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
   const [type, setType] = useState<MedicineType>(initialType);
   const [doses, setDoses] = useState<Dose[]>(initial?.doses ?? resizeDoses([], 1, initialType));
   const [submitted, setSubmitted] = useState(false);
+  const [duplicateName, setDuplicateName] = useState<string | null>(null);
+  const nameInput = useRef<HTMLIonInputElement>(null);
   const [pickingIndex, setPickingIndex] = useState<number | null>(null);
   const [pickerDraft, setPickerDraft] = useState<string | null>(null);
 
@@ -79,33 +90,6 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
     setDoses(resizeDoses(doses, Number(value), type));
   }
 
-  function openPicker(index: number) {
-    setPickerDraft(null);
-    setPickingIndex(index);
-  }
-
-  function advancePicker() {
-    if (pickingIndex === null) {
-      return;
-    }
-    const wasUnset = doses[pickingIndex]?.time === "";
-    const updated =
-      pickerDraft === null
-        ? doses
-        : doses.map((dose, position) =>
-            position === pickingIndex ? { ...dose, time: pickerDraft } : dose,
-          );
-    setDoses(updated);
-    const next = wasUnset
-      ? updated.findIndex((dose, position) => position > pickingIndex && dose.time === "")
-      : -1;
-    if (next === -1) {
-      setPickingIndex(null);
-    } else {
-      openPicker(next);
-    }
-  }
-
   function updateDose(index: number, changes: Partial<Dose>) {
     setDoses(doses.map((dose, position) => (position === index ? { ...dose, ...changes } : dose)));
   }
@@ -119,6 +103,25 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
     openPicker(doses.length);
   }
 
+  function openPicker(index: number) {
+    setPickerDraft(null);
+    setPickingIndex(index);
+  }
+
+  function closePicker() {
+    if (pickingIndex === null) {
+      return;
+    }
+    if (pickerDraft !== null) {
+      setDoses(
+        doses.map((dose, position) =>
+          position === pickingIndex ? { ...dose, time: pickerDraft } : dose,
+        ),
+      );
+    }
+    setPickingIndex(null);
+  }
+
   function handleTimeChange(datetimeValue: string) {
     const clock = toClockTime(datetimeValue);
     if (clock) {
@@ -128,9 +131,15 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
 
   function handleSubmit() {
     setSubmitted(true);
-    if (Object.keys(validateDraft(draft)).length === 0) {
-      onSubmit(draft);
+    if (Object.keys(validateDraft(draft)).length > 0) {
+      return;
     }
+    const duplicate = findDuplicateName(draft.name, existing, initial?.id);
+    if (duplicate) {
+      setDuplicateName(duplicate.name);
+      return;
+    }
+    onSubmit(draft);
   }
 
   return (
@@ -162,6 +171,7 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
           <IonItem>
             <IonInput
               label={markRequired("Name")}
+              ref={nameInput}
               name="medicine-name"
               labelPlacement="stacked"
               placeholder="e.g. Crocin 650"
@@ -266,12 +276,23 @@ export default function MedicineForm({ initial, onSubmit, onCancel, onDelete }: 
           </div>
         )}
 
+        <IonAlert
+          isOpen={duplicateName !== null}
+          header="Name already used"
+          message={`A medicine named "${duplicateName ?? ""}" already exists. Rename this one to save it.`}
+          buttons={[{ text: "Rename", role: "cancel" }]}
+          onDidDismiss={() => {
+            setDuplicateName(null);
+            nameInput.current?.setFocus();
+          }}
+        />
+
         <IonModal isOpen={pickingIndex !== null} onDidDismiss={() => setPickingIndex(null)}>
           <IonHeader>
             <IonToolbar>
               <IonTitle>Dose time</IonTitle>
               <IonButtons slot="end">
-                <IonButton strong onClick={advancePicker}>
+                <IonButton strong onClick={closePicker}>
                   {pickerDraft === null ? "Skip" : "Done"}
                 </IonButton>
               </IonButtons>

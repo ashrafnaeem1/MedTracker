@@ -12,18 +12,20 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
+  useIonViewWillEnter,
 } from "@ionic/react";
 import { addOutline } from "ionicons/icons";
 import { useState } from "react";
+import { doseLabel } from "../../domain/doseLabel";
+import { formatDose, hasQuantity } from "../../domain/doseUnits";
 import {
   createMedicine,
   updateMedicine,
   type Medicine,
   type MedicineDraft,
 } from "../../domain/medicine";
-import { formatDose, hasQuantity } from "../../domain/doseUnits";
-import { doseLabel } from "../../domain/doseLabel";
 import { formatTime } from "../../domain/time";
+import { takePendingEdit } from "../../shared/pendingEdit";
 import { medicineRepository } from "../../storage/medicineRepository";
 import MedicineForm from "./MedicineForm";
 import { useMedicines } from "./useMedicines";
@@ -43,6 +45,17 @@ export default function MedicinesPage() {
     setEditing(medicine);
     setIsFormOpen(true);
   }
+
+  useIonViewWillEnter(() => {
+    const requestedId = takePendingEdit();
+    if (requestedId === null) {
+      return;
+    }
+    const medicine = medicineRepository.list().find((item) => item.id === requestedId);
+    if (medicine) {
+      openEdit(medicine);
+    }
+  });
 
   function closeForm() {
     setIsFormOpen(false);
@@ -78,7 +91,9 @@ export default function MedicinesPage() {
             {items.map((medicine) => (
               <IonItem key={medicine.id} button detail onClick={() => openEdit(medicine)}>
                 <IonLabel>
-                  <h2>{medicine.name}</h2>
+                  <h2 style={{ fontSize: 20, fontWeight: 700, color: "#111827" }}>
+                    {medicine.name}
+                  </h2>
                   <p>{medicine.formula || medicine.type}</p>
                   {medicine.doses.map((dose, index) => (
                     <p key={dose.time}>
@@ -102,6 +117,7 @@ export default function MedicinesPage() {
           <MedicineForm
             key={editing?.id ?? "new"}
             initial={editing ?? undefined}
+            existing={items}
             onSubmit={save}
             onCancel={closeForm}
             onDelete={editing ? () => setIsConfirmOpen(true) : undefined}

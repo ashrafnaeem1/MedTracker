@@ -10,33 +10,28 @@ import {
 } from "@ionic/react";
 import { IonReactRouter } from "@ionic/react-router";
 import { Navigate, Route } from "react-router-dom";
-
-// Icons for calendar and medkit. Both outline.
 import { calendarOutline, medkitOutline } from "ionicons/icons";
-
-// Pages
-import TodayPage from "./features/today/TodayPage";
-import MedicinePage from "./features/medicines/MedicinePage";
+import TodayPage from "./features/today/SchedulePage";
+import MedicinesPage from "./features/medicines/MedicinesPage";
 
 setupIonicReact();
 
-const App = () => {
+export default function App() {
   return (
     <IonApp>
       <IonReactRouter>
         <IonTabs>
           <IonRouterOutlet>
-            <Route path="/today" element={<TodayPage />} />
-            <Route path="/medicines" element={<MedicinePage />} />
-            <Route path="/" element={<Navigate to="/today" replace />} />
+            <Route path="/schedule" element={<TodayPage />} />
+            <Route path="/medicines" element={<MedicinesPage />} />
+            <Route path="/" element={<Navigate to="/schedule" replace />} />
           </IonRouterOutlet>
 
           <IonTabBar slot="bottom">
-            <IonTabButton tab="today" href="/today">
+            <IonTabButton tab="schedule" href="/schedule">
               <IonIcon icon={calendarOutline} />
-              <IonLabel>Today</IonLabel>
+              <IonLabel>Schedule</IonLabel>
             </IonTabButton>
-
             <IonTabButton tab="medicines" href="/medicines">
               <IonIcon icon={medkitOutline} />
               <IonLabel>Medicines</IonLabel>
@@ -46,6 +41,4 @@ const App = () => {
       </IonReactRouter>
     </IonApp>
   );
-};
-
-export default App;
+}
