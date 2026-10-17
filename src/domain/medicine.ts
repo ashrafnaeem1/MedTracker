@@ -10,6 +10,12 @@ export const MEDICINE_TYPES = [
 
 export type MedicineType = (typeof MEDICINE_TYPES)[number];
 
+export const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+
+export type Weekday = (typeof WEEKDAYS)[number];
+
+export type Repeat = { kind: "daily" } | { kind: "weekly"; days: Weekday[] };
+
 export interface Dose {
   time: string;
   amount: number;
@@ -21,14 +27,15 @@ export interface Medicine {
   name: string;
   formula: string;
   type: MedicineType;
+  repeat: Repeat;
   doses: Dose[];
   createdAt: string;
   updatedAt: string;
 }
 
-export type MedicineDraft = Pick<Medicine, "name" | "formula" | "type" | "doses">;
+export type MedicineDraft = Pick<Medicine, "name" | "formula" | "type" | "repeat" | "doses">;
 
-export type MedicineErrors = Partial<Record<"name" | "times" | "amounts", string>>;
+export type MedicineErrors = Partial<Record<"name" | "times" | "amounts" | "days", string>>;
 
 export function validateDraft(draft: MedicineDraft): MedicineErrors {
   const errors: MedicineErrors = {};
@@ -50,6 +57,10 @@ export function validateDraft(draft: MedicineDraft): MedicineErrors {
     errors.amounts = "Quantity must be more than 0";
   }
 
+  if (draft.repeat.kind === "weekly" && draft.repeat.days.length === 0) {
+    errors.days = "Choose at least one day";
+  }
+
   return errors;
 }
 
@@ -66,17 +77,6 @@ export function updateMedicine(
   return { ...existing, ...normalise(draft), updatedAt: now.toISOString() };
 }
 
-function normalise(draft: MedicineDraft): MedicineDraft {
-  return {
-    name: draft.name.trim(),
-    formula: draft.formula.trim(),
-    type: draft.type,
-    doses: [...draft.doses]
-      .sort((a, b) => a.time.localeCompare(b.time))
-      .map((dose) => ({ ...dose, label: dose.label?.trim() || undefined })),
-  };
-}
-
 export function findDuplicateName(
   name: string,
   medicines: Medicine[],
@@ -84,4 +84,22 @@ export function findDuplicateName(
 ): Medicine | undefined {
   const key = name.trim().toLowerCase();
   return medicines.find((item) => item.id !== ignoreId && item.name.trim().toLowerCase() === key);
+}
+
+function normalise(draft: MedicineDraft): MedicineDraft {
+  const selectedDays: Weekday[] = draft.repeat.kind === "weekly" ? draft.repeat.days : [];
+  const repeat: Repeat =
+    draft.repeat.kind === "weekly"
+      ? { kind: "weekly", days: WEEKDAYS.filter((day) => selectedDays.includes(day)) }
+      : { kind: "daily" };
+
+  return {
+    name: draft.name.trim(),
+    formula: draft.formula.trim(),
+    type: draft.type,
+    repeat,
+    doses: [...draft.doses]
+      .sort((a, b) => a.time.localeCompare(b.time))
+      .map((dose) => ({ ...dose, label: dose.label?.trim() || undefined })),
+  };
 }

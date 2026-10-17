@@ -26,10 +26,11 @@ import {
   type Medicine,
   type MedicineDraft,
 } from "../../domain/medicine";
+import { describeRepeat } from "../../domain/repeat";
 import { formatTime } from "../../domain/time";
 import { takePendingAdd, takePendingEdit } from "../../shared/pendingEdit";
 import { medicineRepository } from "../../storage/medicineRepository";
-import MedicineForm from "./MedicineForm";
+import MedicineWizard from "./wizard/MedicineWizard";
 import { useMedicines } from "./useMedicines";
 
 const ROW_STYLE: CSSProperties = {
@@ -188,6 +189,9 @@ export default function MedicinesPage() {
                     <p style={{ margin: "2px 0 0", fontSize: 14, color: "#374151" }}>
                       {medicine.formula || medicine.type}
                     </p>
+                    <p style={{ margin: "2px 0 0", fontSize: 13, color: "#4b5563" }}>
+                      {describeRepeat(medicine.repeat)}
+                    </p>
                     <div style={{ marginTop: 6 }}>
                       <DoseLines medicine={medicine} />
                     </div>
@@ -205,7 +209,7 @@ export default function MedicinesPage() {
         </IonFab>
 
         <IonModal isOpen={isFormOpen} onDidDismiss={closeForm}>
-          <MedicineForm
+          <MedicineWizard
             key={editing?.id ?? "new"}
             initial={editing ?? undefined}
             existing={items}

@@ -7,39 +7,52 @@ export interface MedicineRepository {
   remove(id: string): void;
 }
 
-const CURRENT_KEY = "medtracker.medicines.v2";
-const LEGACY_KEY = "medtracker.medicines.v1";
+const KEY_V1 = "medtracker.medicines.v1";
+const KEY_V2 = "medtracker.medicines.v2";
+const KEY_V3 = "medtracker.medicines.v3";
 
-interface LegacyMedicine extends Omit<Medicine, "doses"> {
+type WithoutRepeat = Omit<Medicine, "repeat">;
+
+interface LegacyV1 extends Omit<Medicine, "doses" | "repeat"> {
   times: string[];
   type: MedicineType;
 }
 
-function readAll(): Medicine[] {
-  const current = localStorage.getItem(CURRENT_KEY);
-  if (current !== null) {
-    return JSON.parse(current) as Medicine[];
-  }
-
-  const legacy = localStorage.getItem(LEGACY_KEY);
-  if (legacy === null) {
-    return [];
-  }
-
-  const migrated = (JSON.parse(legacy) as LegacyMedicine[]).map(migrateLegacy);
-  writeAll(migrated);
-  return migrated;
-}
-
-function migrateLegacy({ times, ...rest }: LegacyMedicine): Medicine {
+function fromLegacyV1(item: LegacyV1): WithoutRepeat {
+  const { times, ...rest } = item;
   return {
     ...rest,
     doses: times.map((time) => ({ time, amount: defaultAmount(rest.type) })),
   };
 }
 
+function readAll(): Medicine[] {
+  const current = localStorage.getItem(KEY_V3);
+  if (current !== null) {
+    return JSON.parse(current) as Medicine[];
+  }
+
+  const v2 = localStorage.getItem(KEY_V2);
+  const v1 = localStorage.getItem(KEY_V1);
+  if (v2 === null && v1 === null) {
+    return [];
+  }
+
+  const stored: WithoutRepeat[] =
+    v2 !== null
+      ? (JSON.parse(v2) as WithoutRepeat[])
+      : (JSON.parse(v1 as string) as LegacyV1[]).map(fromLegacyV1);
+
+  const migrated: Medicine[] = stored.map((item) => ({
+    ...item,
+    repeat: { kind: "daily" as const },
+  }));
+  writeAll(migrated);
+  return migrated;
+}
+
 function writeAll(medicines: Medicine[]): void {
-  localStorage.setItem(CURRENT_KEY, JSON.stringify(medicines));
+  localStorage.setItem(KEY_V3, JSON.stringify(medicines));
 }
 
 export const medicineRepository: MedicineRepository = {

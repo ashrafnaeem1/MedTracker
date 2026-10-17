@@ -1,4 +1,5 @@
 import { doseLabel } from "./doseLabel";
+import { appliesOn } from "./repeat";
 import { slotId, slotStatus, type DoseLog, type SlotRef, type SlotStatus } from "./doseLog";
 import type { Dose, Medicine } from "./medicine";
 
@@ -22,6 +23,9 @@ export function buildDaySlots(
   const slots: SlotView[] = [];
 
   for (const medicine of medicines) {
+    if (!appliesOn(medicine.repeat, date)) {
+      continue;
+    }
     medicine.doses.forEach((dose, index) => {
       const ref: SlotRef = { medicineId: medicine.id, date, time: dose.time };
       const key = slotId(ref);
