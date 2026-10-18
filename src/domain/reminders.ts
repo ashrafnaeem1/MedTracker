@@ -10,6 +10,7 @@ export interface ReminderPlan {
 }
 
 const DAY_MS = 24 * 60 * 60 * 1000;
+const GRACE_MS = 5 * 60 * 1000;
 
 export function upcomingReminders(
   medicines: Medicine[],
@@ -32,7 +33,7 @@ export function upcomingReminders(
         const key = slotId({ medicineId: medicine.id, date, time: dose.time });
         const at = slotMoment(date, dose.time);
         const untilDue = at.getTime() - now.getTime();
-        if (untilDue <= 0 || untilDue > DAY_MS || loggedKeys.has(key)) {
+        if (untilDue <= -GRACE_MS || untilDue > DAY_MS || loggedKeys.has(key)) {
           continue;
         }
         plans.push({ key, at });

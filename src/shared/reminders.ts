@@ -7,6 +7,8 @@ import { useNow } from "./useNow";
 const REMINDER_TITLE = "Time for your medicine";
 const ICON_PATH = "/icons/icon-192.png";
 
+const scheduled = new Map<string, number>();
+
 export type ReminderPermission = NotificationPermission | "unsupported";
 
 export function reminderPermission(): ReminderPermission {
@@ -21,12 +23,13 @@ export async function requestReminderPermission(): Promise<ReminderPermission> {
 }
 
 async function showReminder(tag: string): Promise<void> {
-  const stillDue = !doseLogRepository.list().some((log) => log.id === tag);
-  if (!stillDue) {
+  scheduled.delete(tag);
+  if (doseLogRepository.list().some((log) => log.id === tag)) {
     return;
   }
-  if ("serviceWorker" in navigator) {
-    const registration = await navigator.serviceWorker.ready;
+  const registration =
+    "serviceWorker" in navigator ? await navigator.serviceWorker.getRegistration() : undefined;
+  if (registration) {
     await registration.showNotification(REMINDER_TITLE, { tag, icon: ICON_PATH });
     return;
   }
@@ -41,17 +44,30 @@ export function useReminders(): void {
     if (reminderPermission() !== "granted") {
       return;
     }
-    const timers = upcomingReminders(
+
+    const plans = upcomingReminders(
       medicineRepository.list(),
       doseLogRepository.list(),
       new Date(),
-    ).map((plan) =>
-      window.setTimeout(() => {
-        void showReminder(plan.key);
-      }, plan.at.getTime() - Date.now()),
     );
-    return () => {
-      timers.forEach((timer) => window.clearTimeout(timer));
-    };
+    const wanted = new Set(plans.map((plan) => plan.key));
+
+    for (const [key, timer] of scheduled) {
+      if (!wanted.has(key)) {
+        window.clearTimeout(timer);
+        scheduled.delete(key);
+      }
+    }
+
+    for (const plan of plans) {
+      if (scheduled.has(plan.key)) {
+        continue;
+      }
+      const delay = Math.max(0, plan.at.getTime() - Date.now());
+      scheduled.set(
+        plan.key,
+        window.setTimeout(() => void showReminder(plan.key), delay),
+      );
+    }
   }, [minuteKey]);
 }

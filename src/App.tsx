@@ -11,18 +11,20 @@ import {
 import { IonReactRouter } from "@ionic/react-router";
 import { Navigate, Route } from "react-router-dom";
 import { calendarOutline, medkitOutline } from "ionicons/icons";
-import TodayPage from "./features/today/SchedulePage";
+import SchedulePage from "./features/today/SchedulePage";
+import { useReminders } from "./shared/reminders";
 import MedicinesPage from "./features/medicines/MedicinesPage";
 
 setupIonicReact();
 
 export default function App() {
+  useReminders();
   return (
     <IonApp>
       <IonReactRouter>
         <IonTabs>
           <IonRouterOutlet>
-            <Route path="/schedule" element={<TodayPage />} />
+            <Route path="/schedule" element={<SchedulePage />} />
             <Route path="/medicines" element={<MedicinesPage />} />
             <Route path="/" element={<Navigate to="/schedule" replace />} />
           </IonRouterOutlet>
