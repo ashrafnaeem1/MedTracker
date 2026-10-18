@@ -15,6 +15,7 @@ import { useNavigate } from "react-router-dom";
 import { requestAdd, requestEdit } from "../../shared/pendingEdit";
 import { toIsoDate } from "../../domain/date";
 import { useNow } from "../../shared/useNow";
+import ReminderPrompt from "../../shared/ReminderPrompt";
 import DateStrip from "./DateStrip";
 import Timeline from "./Timeline";
 import { useDaySlots } from "./useDaySlots";
@@ -41,6 +42,7 @@ export default function SchedulePage() {
 
       <IonContent>
         <DateStrip selected={selected} today={today} onChange={setSelected} />
+        <ReminderPrompt />
         <Timeline
           slots={slots}
           today={today}

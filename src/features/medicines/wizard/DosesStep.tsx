@@ -1,4 +1,5 @@
 import {
+  IonAlert,
   IonButton,
   IonButtons,
   IonContent,
@@ -18,7 +19,7 @@ import { useState } from "react";
 import { defaultAmount } from "../../../domain/doseUnits";
 import type { Dose, MedicineErrors, MedicineType } from "../../../domain/medicine";
 import { DOSE_PRESETS, resizeDoses } from "../../../domain/presets";
-import { toClockTime } from "../../../domain/time";
+import { formatTime, toClockTime } from "../../../domain/time";
 import DoseRow from "../DoseRow";
 
 interface DosesStepProps {
@@ -30,12 +31,18 @@ interface DosesStepProps {
 
 const TIME_PICKER_ANCHOR_DATE = "2000-01-01";
 
+function clockNow(): string {
+  const now = new Date();
+  return `${String(now.getHours()).padStart(2, "0")}:${String(now.getMinutes()).padStart(2, "0")}`;
+}
+
 export default function DosesStep({ type, doses, errors, onChange }: DosesStepProps) {
   const [pickingIndex, setPickingIndex] = useState<number | null>(null);
   const [pickerDraft, setPickerDraft] = useState<string | null>(null);
+  const [pendingConfirm, setPendingConfirm] = useState<string | null>(null);
 
-  const pickerValue =
-    pickerDraft ?? (pickingIndex !== null ? doses[pickingIndex]?.time : undefined);
+  const currentTime = pickingIndex !== null ? (doses[pickingIndex]?.time ?? "") : "";
+  const pickerValue = pickerDraft ?? (currentTime !== "" ? currentTime : undefined);
 
   function updateDose(index: number, changes: Partial<Dose>) {
     onChange(doses.map((dose, position) => (position === index ? { ...dose, ...changes } : dose)));
@@ -46,7 +53,8 @@ export default function DosesStep({ type, doses, errors, onChange }: DosesStepPr
   }
 
   function openPicker(index: number) {
-    setPickerDraft(null);
+    const existing = doses[index]?.time ?? "";
+    setPickerDraft(existing === "" ? clockNow() : null);
     setPickingIndex(index);
   }
 
@@ -55,14 +63,23 @@ export default function DosesStep({ type, doses, errors, onChange }: DosesStepPr
     openPicker(doses.length);
   }
 
-  function closePicker() {
+  function commitTime(time: string) {
+    if (pickingIndex !== null) {
+      updateDose(pickingIndex, { time });
+    }
+    setPendingConfirm(null);
+    setPickingIndex(null);
+  }
+
+  function handleDone() {
     if (pickingIndex === null) {
       return;
     }
-    if (pickerDraft !== null) {
-      updateDose(pickingIndex, { time: pickerDraft });
+    if (pickerDraft === null || pickerDraft === currentTime) {
+      commitTime(currentTime);
+      return;
     }
-    setPickingIndex(null);
+    setPendingConfirm(pickerDraft);
   }
 
   function handleTimeChange(datetimeValue: string) {
@@ -128,8 +145,8 @@ export default function DosesStep({ type, doses, errors, onChange }: DosesStepPr
           <IonToolbar>
             <IonTitle>Dose time</IonTitle>
             <IonButtons slot="end">
-              <IonButton strong onClick={closePicker}>
-                {pickerDraft === null ? "Skip" : "Done"}
+              <IonButton strong onClick={handleDone}>
+                Done
               </IonButton>
             </IonButtons>
           </IonToolbar>
@@ -143,6 +160,17 @@ export default function DosesStep({ type, doses, errors, onChange }: DosesStepPr
           />
         </IonContent>
       </IonModal>
+
+      <IonAlert
+        isOpen={pendingConfirm !== null}
+        header="Confirm time"
+        message={pendingConfirm ? `Set this dose to ${formatTime(pendingConfirm)}?` : ""}
+        buttons={[
+          { text: "Change", role: "cancel", handler: () => setPendingConfirm(null) },
+          { text: "Confirm", handler: () => commitTime(pendingConfirm ?? "") },
+        ]}
+        onDidDismiss={() => setPendingConfirm(null)}
+      />
     </>
   );
 }
