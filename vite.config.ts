@@ -6,7 +6,13 @@ export default defineConfig({
   plugins: [
     react(),
     VitePWA({
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
       registerType: "autoUpdate",
+      injectManifest: {
+        globPatterns: ["**/*.{js,css,html,png,svg}"],
+      },
       includeAssets: ["icons/icon-192.png", "icons/icon-512.png"],
       manifest: {
         name: "MedTracker",

@@ -30,10 +30,14 @@ async function showReminder(tag: string): Promise<void> {
   const registration =
     "serviceWorker" in navigator ? await navigator.serviceWorker.getRegistration() : undefined;
   if (registration) {
-    await registration.showNotification(REMINDER_TITLE, { tag, icon: ICON_PATH });
+    await registration.showNotification(REMINDER_TITLE, {
+      tag,
+      icon: ICON_PATH,
+      data: { slotKey: tag },
+    });
     return;
   }
-  new Notification(REMINDER_TITLE, { tag, icon: ICON_PATH });
+  new Notification(REMINDER_TITLE, { tag, icon: ICON_PATH, data: { slotKey: tag } });
 }
 
 export function useReminders(): void {

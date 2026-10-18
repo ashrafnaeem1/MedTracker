@@ -1,6 +1,7 @@
 import { IonActionSheet, IonAlert, IonIcon } from "@ionic/react";
 import {
   arrowUndoOutline,
+  notificationsOutline,
   checkmarkCircleOutline,
   checkmarkOutline,
   closeCircleOutline,
@@ -28,6 +29,7 @@ interface SlotCardProps {
   slot: SlotView;
   today: string;
   onEdit: (medicineId: string) => void;
+  focused?: boolean;
   onRecord: (ref: SlotRef, status: RecordedStatus) => void;
   onUndo: (ref: SlotRef) => void;
 }
@@ -49,10 +51,10 @@ const STATUS_VIEW: Record<SlotStatus, StatusView> = {
 const BUTTON_BASE: CSSProperties = {
   minHeight: 44,
   minWidth: 44,
-  width: "100%",
-  padding: "0 12px",
+  width: "auto",
+  padding: "0 14px",
   borderRadius: 12,
-  fontSize: 16,
+  fontSize: 15,
   fontWeight: 600,
   display: "inline-flex",
   alignItems: "center",
@@ -74,7 +76,14 @@ function describeLog(slot: SlotView): string | null {
 
 const HOLD_MS = 500;
 
-export default function SlotCard({ slot, today, onRecord, onUndo, onEdit }: SlotCardProps) {
+export default function SlotCard({
+  slot,
+  today,
+  onRecord,
+  onUndo,
+  onEdit,
+  focused = false,
+}: SlotCardProps) {
   const [confirmEarly, setConfirmEarly] = useState(false);
   const [expanded, setExpanded] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
@@ -109,7 +118,10 @@ export default function SlotCard({ slot, today, onRecord, onUndo, onEdit }: Slot
   const showPrimaryTake = slot.status === "unknown" && showTakeNow;
 
   return (
-    <li style={{ display: "flex", gap: 12, marginBottom: 8, listStyle: "none" }}>
+    <li
+      data-slot-key={slot.key}
+      style={{ display: "flex", gap: 12, marginBottom: 8, listStyle: "none" }}
+    >
       <time
         dateTime={slot.ref.time}
         style={{
@@ -146,6 +158,8 @@ export default function SlotCard({ slot, today, onRecord, onUndo, onEdit }: Slot
           minWidth: 0,
           padding: 12,
           borderRadius: 16,
+          outline: focused ? "3px solid #111827" : "none",
+          outlineOffset: 4,
           border: `1px solid ${PALETTE.cardBorder[slot.status]}`,
           background: view.colors.background,
           color: PALETTE.text,
@@ -166,7 +180,32 @@ export default function SlotCard({ slot, today, onRecord, onUndo, onEdit }: Slot
           }}
           style={{ display: "flex", flexDirection: "column", gap: 4, cursor: "pointer" }}
         >
-          <div style={{ display: "flex", justifyContent: "flex-end" }}>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+              gap: 8,
+            }}
+          >
+            {focused && (
+              <span
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "4px 10px",
+                  borderRadius: 999,
+                  background: "#111827",
+                  color: "#ffffff",
+                  fontSize: 14,
+                  fontWeight: 700,
+                }}
+              >
+                <IonIcon icon={notificationsOutline} aria-hidden="true" />
+                Reminder
+              </span>
+            )}
             <span
               style={{
                 display: "inline-flex",

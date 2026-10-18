@@ -2,13 +2,14 @@ import type { SlotView } from "../../domain/daySchedule";
 import type { RecordedStatus, SlotRef } from "../../domain/doseLog";
 import { formatTime } from "../../domain/time";
 import { PALETTE } from "./palette";
-import EmptySchedule from "./EmptySchedule";
 import { SECTION_PADDING_BOTTOM_PX } from "./layout";
+import EmptySchedule from "./EmptySchedule";
 import SlotCard from "./SlotCard";
 
 interface TimelineProps {
   slots: SlotView[];
   today: string;
+  focusedKey: string | null;
   onEdit: (medicineId: string) => void;
   onAdd: () => void;
   onRecord: (ref: SlotRef, status: RecordedStatus) => void;
@@ -82,7 +83,15 @@ function SectionHeading({ label }: { label: string }) {
   );
 }
 
-export default function Timeline({ slots, today, onRecord, onUndo, onEdit, onAdd }: TimelineProps) {
+export default function Timeline({
+  slots,
+  today,
+  focusedKey,
+  onEdit,
+  onAdd,
+  onRecord,
+  onUndo,
+}: TimelineProps) {
   if (slots.length === 0) {
     return <EmptySchedule onAdd={onAdd} />;
   }
@@ -120,6 +129,7 @@ export default function Timeline({ slots, today, onRecord, onUndo, onEdit, onAdd
                   key={slot.key}
                   slot={slot}
                   today={today}
+                  focused={slot.key === focusedKey}
                   onRecord={onRecord}
                   onUndo={onUndo}
                   onEdit={onEdit}
