@@ -10,8 +10,8 @@
     "fmt": "oxfmt",
     "fmt:check": "oxfmt --check",
     "preview": "vite preview",
-    "sounds:zip": "node scripts/make-sounds-zip.js",
-    "setup:sounds": "node scripts/download-sounds.js",
+    "sounds:zip": "node scripts/make-sounds-zip.cjs",
+    "setup:sounds": "node scripts/download-sounds.cjs",
     "postinstall": "pnpm setup:sounds"
   },
   "dependencies": {

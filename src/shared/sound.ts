@@ -9,7 +9,8 @@ const SOURCES: Record<SoundName, string> = {
   undo: "/public/sounds/wav_from_original/drop_003.wav",
   // cycle:invert
   step: "/public/sounds/wav_from_original/confirmation_001.wav",
-  save: "/public/sounds/wav_from_original/confirmation_001.wav",
+  // cycle:invert
+  save: "/public/sounds/wav_from_original/confirmation_003.wav",
   tab: "/public/sounds/wav_from_original/confirmation_001.wav",
 };
 
