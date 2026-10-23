@@ -12,6 +12,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@capacitor/android": "^8.5.3",
+    "@capacitor/core": "^8.5.3",
     "@ionic/react": "^9.0.8",
     "@ionic/react-router": "^9.0.8",
     "howler": "^2.2.4",
@@ -21,6 +23,7 @@
     "react-router-dom": "^6.30.6"
   },
   "devDependencies": {
+    "@capacitor/cli": "^8.5.3",
     "@types/howler": "^2.2.13",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
