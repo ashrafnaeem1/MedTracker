@@ -1,0 +1,7 @@
+/* Undo toast: opaque surface that follows the Ionic palette; sits just below the page header. */
+.app-toast {
+  --background: var(--ion-card-background, #ffffff);
+  --color: var(--ion-text-color, #111827);
+  --button-color: var(--ion-text-color, #111827);
+  --offset-top: calc(56px + env(safe-area-inset-top));
+}

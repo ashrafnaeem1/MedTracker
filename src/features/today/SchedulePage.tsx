@@ -7,13 +7,16 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
+  useIonToast,
   useIonViewWillEnter,
 } from "@ionic/react";
 import { todayOutline } from "ionicons/icons";
 import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toIsoDate } from "../../domain/date";
+import type { RecordedStatus, SlotRef } from "../../domain/doseLog";
 import { requestAdd, requestEdit } from "../../shared/pendingEdit";
+import { playSound } from "../../shared/sound";
 import ReminderPrompt from "../../shared/ReminderPrompt";
 import { useNow } from "../../shared/useNow";
 import DateStrip from "./DateStrip";
@@ -22,6 +25,7 @@ import { useDaySlots } from "./useDaySlots";
 import { useSlotFocus } from "./useSlotFocus";
 
 const FOCUS_DURATION_MS = 10_000;
+const UNDO_DURATION_MS = 5_000;
 
 export default function SchedulePage() {
   const navigate = useNavigate();
@@ -30,6 +34,24 @@ export default function SchedulePage() {
   const [selected, setSelected] = useState(today);
   const [focusedKey, setFocusedKey] = useState<string | null>(null);
   const { slots, record, undo, refresh: refreshSlots } = useDaySlots(selected, clock.now);
+  const [presentToast] = useIonToast();
+
+  function undoWithSound(ref: SlotRef) {
+    playSound("undo");
+    undo(ref);
+  }
+
+  function recordWithToast(ref: SlotRef, status: RecordedStatus) {
+    record(ref, status);
+    playSound(status === "taken" ? "taken" : "missed");
+    presentToast({
+      message: status === "taken" ? "Dose marked as taken" : "Dose marked as missed",
+      duration: UNDO_DURATION_MS,
+      position: "top",
+      cssClass: "app-toast",
+      buttons: [{ text: "Undo", handler: () => undoWithSound(ref) }],
+    });
+  }
 
   const openFromReminder = useCallback(
     (slotKey: string) => {
@@ -80,8 +102,8 @@ export default function SchedulePage() {
           slots={slots}
           today={today}
           focusedKey={focusedKey}
-          onRecord={record}
-          onUndo={undo}
+          onRecord={recordWithToast}
+          onUndo={undoWithSound}
           onEdit={(medicineId) => {
             requestEdit(medicineId);
             navigate("/medicines");

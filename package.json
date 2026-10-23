@@ -14,12 +14,14 @@
   "dependencies": {
     "@ionic/react": "^9.0.8",
     "@ionic/react-router": "^9.0.8",
+    "howler": "^2.2.4",
     "ionicons": "^8.1.0",
     "react": "^19.2.8",
     "react-dom": "^19.2.8",
     "react-router-dom": "^6.30.6"
   },
   "devDependencies": {
+    "@types/howler": "^2.2.13",
     "@types/node": "^24.13.3",
     "@types/react": "^19.2.18",
     "@types/react-dom": "^19.2.7",

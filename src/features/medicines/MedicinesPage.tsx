@@ -29,6 +29,7 @@ import {
 import { describeRepeat } from "../../domain/repeat";
 import { formatTime } from "../../domain/time";
 import { takePendingAdd, takePendingEdit } from "../../shared/pendingEdit";
+import { playSound } from "../../shared/sound";
 import { medicineRepository } from "../../storage/medicineRepository";
 import MedicineWizard from "./wizard/MedicineWizard";
 import { useMedicines } from "./useMedicines";
@@ -107,6 +108,7 @@ export default function MedicinesPage() {
   }
 
   function save(draft: MedicineDraft) {
+    playSound("save");
     medicineRepository.save(editing ? updateMedicine(editing, draft) : createMedicine(draft));
     refresh();
     closeForm();

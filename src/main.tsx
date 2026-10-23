@@ -7,7 +7,12 @@ import "@ionic/react/css/typography.css";
 import "@ionic/react/css/padding.css";
 import "@ionic/react/css/flex-utils.css";
 import "@ionic/react/css/text-alignment.css";
+import "@ionic/react/css/palettes/dark.class.css";
+import "./theme/app.css";
 import App from "./App";
+import { applyTheme } from "./shared/theme";
+
+applyTheme("system");
 
 createRoot(document.getElementById("root")!).render(
   <StrictMode>

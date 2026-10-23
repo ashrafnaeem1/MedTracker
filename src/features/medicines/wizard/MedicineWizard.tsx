@@ -21,6 +21,7 @@ import {
   type Weekday,
 } from "../../../domain/medicine";
 import { resizeDoses } from "../../../domain/presets";
+import { playSound } from "../../../shared/sound";
 import BasicsStep from "./BasicsStep";
 import DaysStep from "./DaysStep";
 import DosesStep from "./DosesStep";
@@ -112,6 +113,7 @@ export default function MedicineWizard({
   }
 
   function goTo(id: StepId) {
+    playSound("step");
     setShowErrors(false);
     setStep(id);
   }

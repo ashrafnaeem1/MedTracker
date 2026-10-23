@@ -13,6 +13,7 @@ import { Navigate, Route } from "react-router-dom";
 import { calendarOutline, medkitOutline } from "ionicons/icons";
 import SchedulePage from "./features/today/SchedulePage";
 import { useReminders } from "./shared/reminders";
+import { playSound } from "./shared/sound";
 import MedicinesPage from "./features/medicines/MedicinesPage";
 
 setupIonicReact();
@@ -30,11 +31,11 @@ export default function App() {
           </IonRouterOutlet>
 
           <IonTabBar slot="bottom">
-            <IonTabButton tab="schedule" href="/schedule">
+            <IonTabButton tab="schedule" href="/schedule" onClick={() => playSound("tab")}>
               <IonIcon icon={calendarOutline} />
               <IonLabel>Schedule</IonLabel>
             </IonTabButton>
-            <IonTabButton tab="medicines" href="/medicines">
+            <IonTabButton tab="medicines" href="/medicines" onClick={() => playSound("tab")}>
               <IonIcon icon={medkitOutline} />
               <IonLabel>Medicines</IonLabel>
             </IonTabButton>
