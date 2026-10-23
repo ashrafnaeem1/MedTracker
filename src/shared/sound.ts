@@ -3,15 +3,13 @@ import { Howl } from "howler";
 export type SoundName = "taken" | "missed" | "undo" | "save" | "step" | "tab";
 
 const SOURCES: Record<SoundName, string> = {
-  taken: "/public/sounds/wav_from_original/confirmation_002.wav",
-  missed: "/public/sounds/wav_from_original/click5.wav",
-  // cycle:invert
-  undo: "/public/sounds/wav_from_original/drop_003.wav",
-  // cycle:invert
-  step: "/public/sounds/wav_from_original/confirmation_001.wav",
-  // cycle:invert
-  save: "/public/sounds/wav_from_original/confirmation_003.wav",
-  tab: "/public/sounds/wav_from_original/confirmation_001.wav",
+  // Added leading slash "/" to force absolute root lookup in Capacitor
+  taken: "/sounds/wav_from_original/confirmation_002.wav",
+  missed: "/sounds/wav_from_original/click5.wav",
+  undo: "/sounds/wav_from_original/drop_003.wav",
+  step: "/sounds/wav_from_original/confirmation_001.wav",
+  save: "/sounds/wav_from_original/confirmation_003.wav",
+  tab: "/sounds/wav_from_original/confirmation_001.wav",
 };
 
 const VOLUME: Record<SoundName, number> = {
@@ -40,7 +38,12 @@ export function setExtraSoundsEnabled(value: boolean): void {
 function playerFor(name: SoundName): Howl {
   let player = players.get(name);
   if (!player) {
-    player = new Howl({ src: [SOURCES[name]], volume: VOLUME[name], preload: true });
+    player = new Howl({
+      src: [SOURCES[name]],
+      volume: VOLUME[name],
+      preload: true,
+      html5: true,
+    });
     players.set(name, player);
   }
   return player;
