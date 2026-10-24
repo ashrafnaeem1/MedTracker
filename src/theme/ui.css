@@ -1,6 +1,6 @@
 /*
-  Shared UI classes. Colours come only from Ionic's variables (palette-aware).
-  Components reference these classes; they do not set colours or borders inline.
+  Shared layout classes. Colours are never set here; they come from Ionic's own
+  components and palette variables, so light and dark stay consistent.
 */
 
 .mt-section {
@@ -11,69 +11,31 @@
   margin: 12px 16px 8px;
   font-size: 14px;
   font-weight: 700;
-  color: var(--ion-color-step-700);
 }
 
 .mt-progress {
   margin: 12px 16px 0;
   font-size: 14px;
   font-weight: 600;
-  color: var(--ion-color-step-600);
 }
 
 .mt-row {
-  --background: var(--ion-card-background);
-  --border-color: var(--ion-border-color);
   margin: 0 12px 10px;
-  border: 1px solid var(--ion-border-color);
   border-radius: 16px;
   --padding-top: 12px;
   --padding-bottom: 12px;
-  --inner-border-width: 0;
 }
 
 .mt-name {
   margin: 0;
   font-size: 20px;
   font-weight: 700;
-  color: var(--ion-text-color);
-}
-
-.mt-option {
-  margin: 0 0 12px;
-  border: 2px solid var(--ion-border-color);
-  box-shadow: none;
-}
-
-.mt-option--selected {
-  border-color: var(--ion-color-primary);
-}
-
-.mt-tint-taken {
-  background: color-mix(in srgb, var(--ion-color-success) 12%, var(--ion-card-background));
-  border-color: var(--ion-color-success);
-}
-
-.mt-tint-missed {
-  background: color-mix(in srgb, var(--ion-color-danger) 12%, var(--ion-card-background));
-  border-color: var(--ion-color-danger);
-}
-
-.mt-tint-upcoming {
-  background: color-mix(in srgb, var(--ion-color-medium) 10%, var(--ion-card-background));
-  border-color: var(--ion-color-medium);
-}
-
-.mt-tint-unknown {
-  background: var(--ion-card-background);
-  border-color: var(--ion-color-medium);
-  border-style: dashed;
 }
 
 .mt-stepper {
   display: inline-flex;
   align-items: center;
-  border: 1px solid var(--ion-border-color);
+  border: 1px solid var(--ion-color-step-300);
   border-radius: 999px;
   padding: 0 4px;
 }

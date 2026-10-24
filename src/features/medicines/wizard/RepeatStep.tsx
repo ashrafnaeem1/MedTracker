@@ -1,4 +1,4 @@
-import { IonCard, IonCardContent, IonCardSubtitle, IonCardTitle } from "@ionic/react";
+import { IonItem, IonLabel, IonList, IonRadio, IonRadioGroup } from "@ionic/react";
 import type { Repeat } from "../../../domain/medicine";
 
 interface RepeatStepProps {
@@ -12,29 +12,27 @@ const OPTIONS = [
 ] as const;
 
 export default function RepeatStep({ repeat, onChange }: RepeatStepProps) {
+  function select(kind: "daily" | "weekly") {
+    if (kind === "daily") {
+      onChange({ kind: "daily" });
+    } else {
+      onChange({ kind: "weekly", days: repeat.kind === "weekly" ? repeat.days : [] });
+    }
+  }
+
   return (
-    <div className="mt-section">
-      {OPTIONS.map((option) => {
-        const selected = repeat.kind === option.kind;
-        const next: Repeat =
-          option.kind === "daily"
-            ? { kind: "daily" }
-            : { kind: "weekly", days: repeat.kind === "weekly" ? repeat.days : [] };
-        return (
-          <IonCard
-            key={option.kind}
-            button
-            aria-pressed={selected}
-            className={`mt-option ${selected ? "mt-option--selected" : ""}`}
-            onClick={() => onChange(next)}
-          >
-            <IonCardContent>
-              <IonCardTitle>{option.title}</IonCardTitle>
-              <IonCardSubtitle>{option.detail}</IonCardSubtitle>
-            </IonCardContent>
-          </IonCard>
-        );
-      })}
-    </div>
+    <IonRadioGroup value={repeat.kind} onIonChange={(event) => select(event.detail.value)}>
+      <IonList>
+        {OPTIONS.map((option) => (
+          <IonItem key={option.kind} lines="full">
+            <IonLabel className="ion-text-wrap">
+              <h2>{option.title}</h2>
+              <p>{option.detail}</p>
+            </IonLabel>
+            <IonRadio slot="end" value={option.kind} />
+          </IonItem>
+        ))}
+      </IonList>
+    </IonRadioGroup>
   );
 }

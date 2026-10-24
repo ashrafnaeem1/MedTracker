@@ -48,11 +48,7 @@ export default function DoseRow({
             <IonIcon slot="end" icon={createOutline} aria-hidden="true" />
           </IonInput>
 
-          <IonChip
-            color={dose.time ? "medium" : "warning"}
-            outline={dose.time !== ""}
-            onClick={onPickTime}
-          >
+          <IonChip color={dose.time ? "medium" : "warning"} outline onClick={onPickTime}>
             {dose.time ? formatTime(dose.time) : markRequired("Choose time")}
           </IonChip>
 
