@@ -9,6 +9,8 @@ import {
   IonItem,
   IonLabel,
   IonList,
+  IonNote,
+  IonText,
   IonListHeader,
   IonModal,
   IonPage,
@@ -17,57 +19,33 @@ import {
   useIonViewWillEnter,
 } from "@ionic/react";
 import { addOutline, medkitOutline } from "ionicons/icons";
-import { useState, type CSSProperties } from "react";
+import { useState } from "react";
 import { doseLabel } from "../../domain/doseLabel";
 import { formatDose, hasQuantity } from "../../domain/doseUnits";
+import { describeRepeat } from "../../domain/repeat";
 import {
   createMedicine,
   updateMedicine,
   type Medicine,
   type MedicineDraft,
 } from "../../domain/medicine";
-import { describeRepeat } from "../../domain/repeat";
 import { formatTime } from "../../domain/time";
+import { appActions } from "../../shared/actions";
 import { takePendingAdd, takePendingEdit } from "../../shared/pendingEdit";
 import { playSound } from "../../shared/sound";
 import { medicineRepository } from "../../storage/medicineRepository";
 import MedicineWizard from "./wizard/MedicineWizard";
 import { useMedicines } from "./useMedicines";
 
-const ROW_STYLE: CSSProperties = {
-  marginBottom: 10,
-  border: "1px solid #e5e7eb",
-  borderRadius: 16,
-  background: "#ffffff",
-  "--padding-top": "12px",
-  "--padding-bottom": "12px",
-  "--inner-border-width": "0",
-} as CSSProperties;
-
 function DoseLines({ medicine }: { medicine: Medicine }) {
   return (
     <>
-      {medicine.doses.map((dose, index) => {
-        return (
-          <p
-            key={dose.time}
-            style={{
-              margin: "4px 0 0",
-              fontSize: 13,
-              color: "#4b5563",
-              display: "flex",
-              alignItems: "center",
-              gap: 8,
-              flexWrap: "wrap",
-            }}
-          >
-            <span>
-              {doseLabel(dose, index + 1)} · {formatTime(dose.time)}
-            </span>
-            {hasQuantity(medicine.type) && <span>{formatDose(dose.amount, medicine.type)}</span>}
-          </p>
-        );
-      })}
+      {medicine.doses.map((dose, index) => (
+        <IonNote key={dose.time} style={{ display: "block" }}>
+          {doseLabel(dose, index + 1)} · {formatTime(dose.time)}
+          {hasQuantity(medicine.type) && ` · ${formatDose(dose.amount, medicine.type)}`}
+        </IonNote>
+      ))}
     </>
   );
 }
@@ -109,14 +87,14 @@ export default function MedicinesPage() {
 
   function save(draft: MedicineDraft) {
     playSound("save");
-    medicineRepository.save(editing ? updateMedicine(editing, draft) : createMedicine(draft));
+    appActions.saveMedicine(editing ? updateMedicine(editing, draft) : createMedicine(draft));
     refresh();
     closeForm();
   }
 
   function confirmDelete() {
     if (editing) {
-      medicineRepository.remove(editing.id);
+      appActions.removeMedicine(editing.id);
       refresh();
     }
     closeForm();
@@ -132,19 +110,15 @@ export default function MedicinesPage() {
 
       <IonContent>
         {items.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "64px 24px" }}>
-            <IonIcon
-              icon={medkitOutline}
-              aria-hidden="true"
-              style={{ fontSize: 56, color: "#4b5563" }}
-            />
-            <h2 style={{ margin: "16px 0 8px", fontSize: 20, fontWeight: 700, color: "#111827" }}>
+          <div className="mt-empty">
+            <IonIcon icon={medkitOutline} aria-hidden="true" style={{ fontSize: 56 }} />
+            <h2 className="mt-name" style={{ margin: "16px 0 8px" }}>
               No medicines yet
             </h2>
-            <p style={{ margin: 0, fontSize: 16, color: "#374151" }}>
-              Add a medicine and its doses to see them on the Schedule tab.
-            </p>
-            <IonButton style={{ marginTop: 24, minHeight: 44 }} onClick={openAdd}>
+            <IonText color="medium">
+              <p>Add a medicine and its doses to see them on the Schedule tab.</p>
+            </IonText>
+            <IonButton style={{ marginTop: 24 }} onClick={openAdd}>
               <IonIcon slot="start" icon={addOutline} aria-hidden="true" />
               Add medicine
             </IonButton>
@@ -152,32 +126,24 @@ export default function MedicinesPage() {
         ) : (
           <>
             <IonListHeader>
-              <IonLabel style={{ fontSize: 14, fontWeight: 600, color: "#374151" }}>
+              <IonLabel>
                 {items.length} {items.length === 1 ? "medicine" : "medicines"}
               </IonLabel>
             </IonListHeader>
-            <IonList lines="none" style={{ padding: "0 12px" }}>
+            <IonList lines="none">
               {items.map((medicine) => (
                 <IonItem
                   key={medicine.id}
                   button
                   detail
                   onClick={() => openEdit(medicine)}
-                  style={ROW_STYLE}
+                  className="mt-row"
                 >
                   <IonLabel className="ion-text-wrap">
-                    <h2 style={{ margin: 0, fontSize: 20, fontWeight: 700, color: "#111827" }}>
-                      {medicine.name}
-                    </h2>
-                    <p style={{ margin: "2px 0 0", fontSize: 14, color: "#374151" }}>
-                      {medicine.formula || medicine.type}
-                    </p>
-                    <p style={{ margin: "2px 0 0", fontSize: 13, color: "#4b5563" }}>
-                      {describeRepeat(medicine.repeat)}
-                    </p>
-                    <div style={{ marginTop: 6 }}>
-                      <DoseLines medicine={medicine} />
-                    </div>
+                    <h2 className="mt-name">{medicine.name}</h2>
+                    <IonNote>{medicine.formula || medicine.type}</IonNote>
+                    <IonNote>{describeRepeat(medicine.repeat)}</IonNote>
+                    <DoseLines medicine={medicine} />
                   </IonLabel>
                 </IonItem>
               ))}
