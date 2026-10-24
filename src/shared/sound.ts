@@ -4,12 +4,12 @@ export type SoundName = "taken" | "missed" | "undo" | "save" | "step" | "tab";
 
 const SOURCES: Record<SoundName, string> = {
   // Added leading slash "/" to force absolute root lookup in Capacitor
-  taken: "/sounds/wav_from_original/confirmation_002.wav",
-  missed: "/sounds/wav_from_original/click5.wav",
-  undo: "/sounds/wav_from_original/drop_003.wav",
-  step: "/sounds/wav_from_original/confirmation_001.wav",
-  save: "/sounds/wav_from_original/confirmation_003.wav",
-  tab: "/sounds/wav_from_original/confirmation_001.wav",
+  taken: "/sounds/confirmation_002.wav",
+  missed: "/sounds/click5.wav",
+  undo: "/sounds/drop_003.wav",
+  step: "/sounds/confirmation_001.wav",
+  save: "/sounds/confirmation_003.wav",
+  tab: "/sounds/confirmation_001.wav",
 };
 
 const VOLUME: Record<SoundName, number> = {
