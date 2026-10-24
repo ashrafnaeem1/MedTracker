@@ -31,12 +31,11 @@ export default function RepeatStep({ repeat, onChange }: RepeatStepProps) {
               padding: 16,
               borderRadius: 16,
               border: `2px solid ${selected ? "#111827" : "#d1d5db"}`,
-              background: selected ? "#f9fafb" : "#ffffff",
               cursor: "pointer",
             }}
           >
-            <div style={{ fontSize: 18, fontWeight: 700, color: "#111827" }}>{option.title}</div>
-            <div style={{ fontSize: 14, color: "#374151", marginTop: 4 }}>{option.detail}</div>
+            <div style={{ fontSize: 18, fontWeight: 700 }}>{option.title}</div>
+            <div style={{ fontSize: 14, marginTop: 4 }}>{option.detail}</div>
           </button>
         );
       })}

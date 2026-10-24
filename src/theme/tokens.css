@@ -1,0 +1,134 @@
+/*
+  App colour tokens.
+  Neutral roles (surfaces, text, borders, greys) come from Ionic's adaptive palette variables,
+  so they match Ionic's own parts everywhere, including inside modals.
+  State colours (Taken, Missed, Not logged, Upcoming) keep app-specific values,
+  switched by the system media query or the ion-palette-dark class.
+*/
+
+:root {
+  --app-surface: var(--ion-card-background, #ffffff);
+  --app-surface-alt: var(--ion-color-step-50, #f9fafb);
+  --app-text: var(--ion-text-color, #111827);
+  --app-muted: var(--ion-color-step-700, #374151);
+  --app-subtle: var(--ion-color-step-600, #4b5563);
+  --app-line: var(--ion-color-step-400, #9ca3af);
+  --app-line-strong: var(--ion-color-step-500, #6b7280);
+  --app-border: var(--ion-border-color, #e5e7eb);
+  --app-border-strong: var(--ion-color-step-300, #d1d5db);
+  --app-chip-bg: var(--ion-color-step-100, #f3f4f6);
+  --app-unset-bg: var(--ion-color-warning-tint, #fef9c3);
+  --app-unset-text: var(--ion-color-warning-shade, #713f12);
+  --app-unset-border: var(--ion-color-warning, #a16207);
+
+  --app-upcoming-bg: #f5f7fa;
+  --app-upcoming-text: #1f2937;
+  --app-upcoming-border: #6b7280;
+  --app-upcoming-card: #c9d3e0;
+  --app-unknown-bg: #fafafa;
+  --app-unknown-text: #111827;
+  --app-unknown-border: #4b5563;
+  --app-unknown-card: #d9d4c9;
+  --app-taken-bg: #f1faf4;
+  --app-taken-text: #0b4d24;
+  --app-taken-border: #1e7a3c;
+  --app-taken-card: #bfe3cc;
+  --app-missed-bg: #fdf3f3;
+  --app-missed-text: #7a1212;
+  --app-missed-border: #b42318;
+  --app-missed-card: #f0c4c4;
+
+  --app-pill-upcoming-bg: #dbeafe;
+  --app-pill-upcoming-text: #1e3a8a;
+  --app-pill-upcoming-border: #1d4ed8;
+  --app-pill-unknown-bg: #fef9c3;
+  --app-pill-unknown-text: #713f12;
+  --app-pill-unknown-border: #a16207;
+  --app-pill-taken-bg: #dcfce7;
+  --app-pill-taken-text: #14532d;
+  --app-pill-taken-border: #15803d;
+  --app-pill-missed-bg: #fee2e2;
+  --app-pill-missed-text: #7f1d1d;
+  --app-pill-missed-border: #b91c1c;
+
+  --app-chip-today-bg: #14532d;
+  --app-chip-today-text: #ffffff;
+  --app-chip-other-bg: #4b5563;
+  --app-chip-other-text: #ffffff;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not(.ion-palette-light) {
+    --app-upcoming-bg: #1e293b;
+    --app-upcoming-text: #e2e8f0;
+    --app-upcoming-border: #64748b;
+    --app-upcoming-card: #334155;
+    --app-unknown-bg: #1f2937;
+    --app-unknown-text: #f3f4f6;
+    --app-unknown-border: #9ca3af;
+    --app-unknown-card: #57534e;
+    --app-taken-bg: #052e16;
+    --app-taken-text: #bbf7d0;
+    --app-taken-border: #22c55e;
+    --app-taken-card: #166534;
+    --app-missed-bg: #450a0a;
+    --app-missed-text: #fecaca;
+    --app-missed-border: #f87171;
+    --app-missed-card: #7f1d1d;
+
+    --app-pill-upcoming-bg: #1e3a8a;
+    --app-pill-upcoming-text: #dbeafe;
+    --app-pill-upcoming-border: #3b82f6;
+    --app-pill-unknown-bg: #422006;
+    --app-pill-unknown-text: #fde68a;
+    --app-pill-unknown-border: #ca8a04;
+    --app-pill-taken-bg: #14532d;
+    --app-pill-taken-text: #dcfce7;
+    --app-pill-taken-border: #22c55e;
+    --app-pill-missed-bg: #7f1d1d;
+    --app-pill-missed-text: #fee2e2;
+    --app-pill-missed-border: #f87171;
+
+    --app-chip-today-bg: #86efac;
+    --app-chip-today-text: #052e16;
+    --app-chip-other-bg: #9ca3af;
+    --app-chip-other-text: #111827;
+  }
+}
+
+:root.ion-palette-dark {
+  --app-upcoming-bg: #1e293b;
+  --app-upcoming-text: #e2e8f0;
+  --app-upcoming-border: #64748b;
+  --app-upcoming-card: #334155;
+  --app-unknown-bg: #1f2937;
+  --app-unknown-text: #f3f4f6;
+  --app-unknown-border: #9ca3af;
+  --app-unknown-card: #57534e;
+  --app-taken-bg: #052e16;
+  --app-taken-text: #bbf7d0;
+  --app-taken-border: #22c55e;
+  --app-taken-card: #166534;
+  --app-missed-bg: #450a0a;
+  --app-missed-text: #fecaca;
+  --app-missed-border: #f87171;
+  --app-missed-card: #7f1d1d;
+
+  --app-pill-upcoming-bg: #1e3a8a;
+  --app-pill-upcoming-text: #dbeafe;
+  --app-pill-upcoming-border: #3b82f6;
+  --app-pill-unknown-bg: #422006;
+  --app-pill-unknown-text: #fde68a;
+  --app-pill-unknown-border: #ca8a04;
+  --app-pill-taken-bg: #14532d;
+  --app-pill-taken-text: #dcfce7;
+  --app-pill-taken-border: #22c55e;
+  --app-pill-missed-bg: #7f1d1d;
+  --app-pill-missed-text: #fee2e2;
+  --app-pill-missed-border: #f87171;
+
+  --app-chip-today-bg: #86efac;
+  --app-chip-today-text: #052e16;
+  --app-chip-other-bg: #9ca3af;
+  --app-chip-other-text: #111827;
+}

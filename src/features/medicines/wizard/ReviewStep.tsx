@@ -26,13 +26,11 @@ function SummaryCard({
   children: ReactNode;
 }) {
   return (
-    <section
-      style={{ border: "1px solid #e5e7eb", borderRadius: 16, padding: 14, background: "#ffffff" }}
-    >
+    <section style={{ border: "1px solid", borderRadius: 16, padding: 14 }}>
       <div
         style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}
       >
-        <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#374151" }}>{title}</h3>
+        <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700 }}>{title}</h3>
         <IonButton fill="clear" size="small" onClick={onEdit} style={{ minHeight: 44 }}>
           <IonIcon slot="start" icon={createOutline} aria-hidden="true" />
           Edit
@@ -53,14 +51,12 @@ export default function ReviewStep({
   return (
     <div style={{ padding: 16, display: "grid", gap: 12 }}>
       <SummaryCard title="Medicine" onEdit={() => onEdit("basics")}>
-        <div style={{ fontSize: 20, fontWeight: 700, color: "#111827" }}>
-          {draft.name || "No name"}
-        </div>
-        <div style={{ fontSize: 14, color: "#374151" }}>{draft.formula || draft.type}</div>
+        <div style={{ fontSize: 20, fontWeight: 700 }}>{draft.name || "No name"}</div>
+        <div style={{ fontSize: 14 }}>{draft.formula || draft.type}</div>
       </SummaryCard>
 
       <SummaryCard title="How often" onEdit={() => onEdit("repeat")}>
-        <div style={{ fontSize: 16, color: "#111827" }}>{describeRepeat(draft.repeat)}</div>
+        <div style={{ fontSize: 16 }}>{describeRepeat(draft.repeat)}</div>
         {draft.repeat.kind === "weekly" && (
           <IonButton
             fill="clear"
@@ -75,10 +71,7 @@ export default function ReviewStep({
 
       <SummaryCard title="Doses" onEdit={() => onEdit("doses")}>
         {draft.doses.map((dose, index) => (
-          <div
-            key={`${dose.time}-${index}`}
-            style={{ fontSize: 14, color: "#111827", padding: "2px 0" }}
-          >
+          <div key={`${dose.time}-${index}`} style={{ fontSize: 14, padding: "2px 0" }}>
             {doseLabel(dose, index + 1)} · {dose.time ? formatTime(dose.time) : "No time"}
             {hasQuantity(draft.type) && ` · ${formatDose(dose.amount, draft.type)}`}
           </div>

@@ -15,9 +15,7 @@ export default function DaysStep({ days, error, onChange }: DaysStepProps) {
 
   return (
     <div style={{ padding: 16 }}>
-      <p style={{ margin: "0 0 12px", fontSize: 16, color: "#374151" }}>
-        Which days should this medicine be taken?
-      </p>
+      <p style={{ margin: "0 0 12px", fontSize: 16 }}>Which days should this medicine be taken?</p>
       <div
         role="group"
         aria-label="Days of the week"
@@ -36,9 +34,7 @@ export default function DaysStep({ days, error, onChange }: DaysStepProps) {
                 minHeight: 44,
                 padding: "0 12px",
                 borderRadius: 999,
-                border: `1px solid ${on ? "#111827" : "#d1d5db"}`,
-                background: on ? "#111827" : "#ffffff",
-                color: on ? "#ffffff" : "#111827",
+                border: `1px solid`,
                 fontWeight: 700,
                 cursor: "pointer",
               }}

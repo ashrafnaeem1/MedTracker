@@ -23,10 +23,9 @@ const PILL: CSSProperties = {
   display: "inline-flex",
   alignItems: "center",
   flexShrink: 0,
-  border: "1px solid #d1d5db",
+  border: "1px solid",
   borderRadius: 999,
   padding: "0 4px",
-  background: "#ffffff",
 };
 
 const STEP_BUTTON: CSSProperties = {
@@ -38,7 +37,6 @@ const STEP_BUTTON: CSSProperties = {
   display: "flex",
   alignItems: "center",
   justifyContent: "center",
-  color: "#111827",
   cursor: "pointer",
 };
 
@@ -51,7 +49,6 @@ const VALUE_INPUT: CSSProperties = {
 
 const UNIT: CSSProperties = {
   fontSize: 14,
-  color: "#374151",
   flexShrink: 0,
   whiteSpace: "nowrap",
   overflow: "visible",
