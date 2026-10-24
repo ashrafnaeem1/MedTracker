@@ -162,7 +162,7 @@ export default function MedicineWizard({
 
       <IonContent>
         {progress && (
-          <p style={{ margin: "12px 16px 0", fontSize: 14, fontWeight: 600 }}>
+          <p style={{ margin: "12px 16px 0", fontSize: 14, fontWeight: 600, color: "#374151" }}>
             {progress} · {STEP_TITLES[step]}
           </p>
         )}

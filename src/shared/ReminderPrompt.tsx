@@ -16,7 +16,7 @@ export default function ReminderPrompt() {
 
   if (permission === "denied") {
     return (
-      <p style={{ margin: "12px 16px 0", fontSize: 14 }}>
+      <p style={{ margin: "12px 16px 0", fontSize: 14, color: "#374151" }}>
         Dose reminders are off. Turn notifications on for this site in your browser settings.
       </p>
     );

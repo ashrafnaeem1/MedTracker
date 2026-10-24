@@ -38,6 +38,8 @@ const NAME_FIELD: CSSProperties = {
   gap: 6,
   padding: "0 10px",
   borderRadius: 10,
+  background: "#f9fafb",
+  borderBottom: "1px solid #9ca3af",
   cursor: "text",
 };
 
@@ -46,6 +48,7 @@ const NAME_INPUT: CSSProperties = {
   minWidth: 0,
   fontSize: 16,
   fontWeight: 600,
+  color: "#111827",
 };
 
 const TIME_BUTTON_BASE: CSSProperties = {
@@ -64,12 +67,16 @@ const TIME_BUTTON_BASE: CSSProperties = {
 
 const TIME_SET: CSSProperties = {
   ...TIME_BUTTON_BASE,
-  border: "1px solid",
+  border: "1px solid #d1d5db",
+  background: "#ffffff",
+  color: "#111827",
 };
 
 const TIME_UNSET: CSSProperties = {
   ...TIME_BUTTON_BASE,
-  border: "1px solid",
+  border: "1px solid #a16207",
+  background: "#fef9c3",
+  color: "#713f12",
 };
 
 export default function DoseRow({
@@ -102,7 +109,7 @@ export default function DoseRow({
             <IonIcon
               icon={createOutline}
               aria-hidden="true"
-              style={{ fontSize: 18, flexShrink: 0 }}
+              style={{ color: "#4b5563", fontSize: 18, flexShrink: 0 }}
             />
           </div>
 
@@ -126,7 +133,9 @@ export default function DoseRow({
 
         {hasQuantity(type) && (
           <div style={ROW_GRID}>
-            <span style={{ fontSize: 14, paddingLeft: 10, whiteSpace: "nowrap" }}>Quantity</span>
+            <span style={{ fontSize: 14, color: "#4b5563", paddingLeft: 10, whiteSpace: "nowrap" }}>
+              Quantity
+            </span>
             <div
               style={{
                 gridColumn: "2 / span 2",

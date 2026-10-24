@@ -92,7 +92,9 @@ export default function DosesStep({ type, doses, errors, onChange }: DosesStepPr
   return (
     <>
       <div style={{ padding: "16px 16px 0" }}>
-        <p style={{ margin: "0 0 8px", fontSize: 16, fontWeight: 700 }}>How many times a day?</p>
+        <p style={{ margin: "0 0 8px", fontSize: 16, fontWeight: 700, color: "#111827" }}>
+          How many times a day?
+        </p>
         <IonSegment
           value={doses.length > 0 ? String(doses.length) : undefined}
           onIonChange={(event) => onChange(resizeDoses(doses, Number(event.detail.value), type))}

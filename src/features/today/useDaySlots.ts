@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import { buildDaySlots } from "../../domain/daySchedule";
-import type { RecordedStatus, SlotRef } from "../../domain/doseLog";
-import { appActions } from "../../shared/actions";
+import { createLog, slotId, type RecordedStatus, type SlotRef } from "../../domain/doseLog";
 import { doseLogRepository } from "../../storage/doseLogRepository";
 import { medicineRepository } from "../../storage/medicineRepository";
 
@@ -12,12 +11,12 @@ export function useDaySlots(date: string, now: Date) {
   const slots = buildDaySlots(medicineRepository.list(), doseLogRepository.list(), date, now);
 
   function record(ref: SlotRef, status: RecordedStatus) {
-    appActions.recordDose(ref, status);
+    doseLogRepository.save(createLog(ref, status, new Date()));
     refresh();
   }
 
   function undo(ref: SlotRef) {
-    appActions.undoDose(ref);
+    doseLogRepository.remove(slotId(ref));
     refresh();
   }
 
