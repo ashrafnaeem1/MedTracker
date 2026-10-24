@@ -14,6 +14,7 @@ import { calendarOutline, medkitOutline } from "ionicons/icons";
 import SchedulePage from "./features/today/SchedulePage";
 import { useReminders } from "./shared/reminders";
 import { playSound } from "./shared/sound";
+import NativeReminderBridge from "./shared/NativeReminderBridge";
 import MedicinesPage from "./features/medicines/MedicinesPage";
 
 setupIonicReact();
@@ -23,6 +24,7 @@ export default function App() {
   return (
     <IonApp>
       <IonReactRouter>
+        <NativeReminderBridge />
         <IonTabs>
           <IonRouterOutlet>
             <Route path="/schedule" element={<SchedulePage />} />

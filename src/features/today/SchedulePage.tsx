@@ -15,7 +15,7 @@ import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { toIsoDate } from "../../domain/date";
 import type { RecordedStatus, SlotRef } from "../../domain/doseLog";
-import { requestAdd, requestEdit } from "../../shared/pendingEdit";
+import { requestAdd, requestEdit, takePendingSlotFocus } from "../../shared/pendingEdit";
 import { playSound } from "../../shared/sound";
 import ReminderPrompt from "../../shared/ReminderPrompt";
 import { useNow } from "../../shared/useNow";
@@ -85,6 +85,10 @@ export default function SchedulePage() {
   useIonViewWillEnter(() => {
     clock.refresh();
     refreshSlots();
+    const pendingSlot = takePendingSlotFocus();
+    if (pendingSlot) {
+      openFromReminder(pendingSlot);
+    }
   });
 
   return (

@@ -2,6 +2,7 @@ import { useEffect } from "react";
 import { upcomingReminders } from "../domain/reminders";
 import { doseLogRepository } from "../storage/doseLogRepository";
 import { medicineRepository } from "../storage/medicineRepository";
+import { isNative } from "./nativeReminders";
 import { useNow } from "./useNow";
 
 const REMINDER_TITLE = "Time for your medicine";
@@ -45,7 +46,7 @@ export function useReminders(): void {
   const minuteKey = now.toISOString().slice(0, 16);
 
   useEffect(() => {
-    if (reminderPermission() !== "granted") {
+    if (isNative() || reminderPermission() !== "granted") {
       return;
     }
 

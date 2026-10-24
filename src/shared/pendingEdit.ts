@@ -20,3 +20,15 @@ export function takePendingAdd(): boolean {
   pendingAdd = false;
   return requested;
 }
+
+let pendingSlotKey: string | null = null;
+
+export function requestSlotFocus(slotKey: string): void {
+  pendingSlotKey = slotKey;
+}
+
+export function takePendingSlotFocus(): string | null {
+  const slotKey = pendingSlotKey;
+  pendingSlotKey = null;
+  return slotKey;
+}

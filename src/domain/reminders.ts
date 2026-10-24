@@ -43,3 +43,36 @@ export function upcomingReminders(
 
   return plans;
 }
+
+export function futureReminders(
+  medicines: Medicine[],
+  logs: DoseLog[],
+  now: Date,
+  days: number,
+): ReminderPlan[] {
+  const loggedKeys = new Set(logs.map((log) => log.id));
+  const today = toIsoDate(now);
+  const plans: ReminderPlan[] = [];
+
+  for (let offset = 0; offset <= days; offset++) {
+    const date = shiftDate(today, offset);
+    for (const medicine of medicines) {
+      if (!appliesOn(medicine.repeat, date)) {
+        continue;
+      }
+      for (const dose of medicine.doses) {
+        if (dose.time === "") {
+          continue;
+        }
+        const key = slotId({ medicineId: medicine.id, date, time: dose.time });
+        const at = slotMoment(date, dose.time);
+        if (at.getTime() <= now.getTime() || loggedKeys.has(key)) {
+          continue;
+        }
+        plans.push({ key, at });
+      }
+    }
+  }
+
+  return plans;
+}
