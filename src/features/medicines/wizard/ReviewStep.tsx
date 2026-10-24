@@ -1,10 +1,19 @@
-import { IonButton, IonIcon } from "@ionic/react";
-import { createOutline } from "ionicons/icons";
 import type { ReactNode } from "react";
+import {
+  IonButton,
+  IonCard,
+  IonCardContent,
+  IonCardHeader,
+  IonCardSubtitle,
+  IonCardTitle,
+  IonIcon,
+  IonNote,
+} from "@ionic/react";
+import { createOutline } from "ionicons/icons";
 import { doseLabel } from "../../../domain/doseLabel";
 import { formatDose, hasQuantity } from "../../../domain/doseUnits";
-import { describeRepeat } from "../../../domain/repeat";
 import type { MedicineDraft } from "../../../domain/medicine";
+import { describeRepeat } from "../../../domain/repeat";
 import { formatTime } from "../../../domain/time";
 import type { StepId } from "./MedicineWizard";
 
@@ -26,20 +35,21 @@ function SummaryCard({
   children: ReactNode;
 }) {
   return (
-    <section
-      style={{ border: "1px solid #e5e7eb", borderRadius: 16, padding: 14, background: "#ffffff" }}
-    >
-      <div
-        style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 8 }}
-      >
-        <h3 style={{ margin: 0, fontSize: 14, fontWeight: 700, color: "#374151" }}>{title}</h3>
-        <IonButton fill="clear" size="small" onClick={onEdit} style={{ minHeight: 44 }}>
+    <IonCard>
+      <IonCardHeader>
+        <IonCardSubtitle>{title}</IonCardSubtitle>
+        <IonButton
+          fill="clear"
+          size="small"
+          onClick={onEdit}
+          style={{ position: "absolute", top: 8, right: 8 }}
+        >
           <IonIcon slot="start" icon={createOutline} aria-hidden="true" />
           Edit
         </IonButton>
-      </div>
-      <div style={{ marginTop: 4 }}>{children}</div>
-    </section>
+      </IonCardHeader>
+      <IonCardContent>{children}</IonCardContent>
+    </IonCard>
   );
 }
 
@@ -51,23 +61,16 @@ export default function ReviewStep({
   onDelete,
 }: ReviewStepProps) {
   return (
-    <div style={{ padding: 16, display: "grid", gap: 12 }}>
+    <div className="mt-section">
       <SummaryCard title="Medicine" onEdit={() => onEdit("basics")}>
-        <div style={{ fontSize: 20, fontWeight: 700, color: "#111827" }}>
-          {draft.name || "No name"}
-        </div>
-        <div style={{ fontSize: 14, color: "#374151" }}>{draft.formula || draft.type}</div>
+        <IonCardTitle>{draft.name || "No name"}</IonCardTitle>
+        <IonNote>{draft.formula || draft.type}</IonNote>
       </SummaryCard>
 
       <SummaryCard title="How often" onEdit={() => onEdit("repeat")}>
-        <div style={{ fontSize: 16, color: "#111827" }}>{describeRepeat(draft.repeat)}</div>
+        <IonCardTitle>{describeRepeat(draft.repeat)}</IonCardTitle>
         {draft.repeat.kind === "weekly" && (
-          <IonButton
-            fill="clear"
-            size="small"
-            onClick={() => onEdit("days")}
-            style={{ minHeight: 44, paddingLeft: 0 }}
-          >
+          <IonButton fill="clear" size="small" onClick={() => onEdit("days")}>
             Change days
           </IonButton>
         )}
@@ -75,27 +78,18 @@ export default function ReviewStep({
 
       <SummaryCard title="Doses" onEdit={() => onEdit("doses")}>
         {draft.doses.map((dose, index) => (
-          <div
-            key={`${dose.time}-${index}`}
-            style={{ fontSize: 14, color: "#111827", padding: "2px 0" }}
-          >
+          <IonNote key={`${dose.time}-${index}`} style={{ display: "block" }}>
             {doseLabel(dose, index + 1)} · {dose.time ? formatTime(dose.time) : "No time"}
             {hasQuantity(draft.type) && ` · ${formatDose(dose.amount, draft.type)}`}
-          </div>
+          </IonNote>
         ))}
       </SummaryCard>
 
-      <IonButton expand="block" onClick={onSave} style={{ minHeight: 44 }}>
+      <IonButton expand="block" onClick={onSave}>
         {isEditing ? "Save changes" : "Save medicine"}
       </IonButton>
       {onDelete && (
-        <IonButton
-          expand="block"
-          color="danger"
-          fill="outline"
-          onClick={onDelete}
-          style={{ minHeight: 44 }}
-        >
+        <IonButton expand="block" color="danger" fill="outline" onClick={onDelete}>
           Delete medicine
         </IonButton>
       )}

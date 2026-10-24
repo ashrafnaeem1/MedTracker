@@ -1,0 +1,105 @@
+/*
+  Shared UI classes. Colours come only from Ionic's variables (palette-aware).
+  Components reference these classes; they do not set colours or borders inline.
+*/
+
+.mt-section {
+  padding: 8px 16px 0;
+}
+
+.mt-section-title {
+  margin: 12px 16px 8px;
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ion-color-step-700);
+}
+
+.mt-progress {
+  margin: 12px 16px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--ion-color-step-600);
+}
+
+.mt-row {
+  --background: var(--ion-card-background);
+  --border-color: var(--ion-border-color);
+  margin: 0 12px 10px;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 16px;
+  --padding-top: 12px;
+  --padding-bottom: 12px;
+  --inner-border-width: 0;
+}
+
+.mt-name {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--ion-text-color);
+}
+
+.mt-option {
+  margin: 0 0 12px;
+  border: 2px solid var(--ion-border-color);
+  box-shadow: none;
+}
+
+.mt-option--selected {
+  border-color: var(--ion-color-primary);
+}
+
+.mt-tint-taken {
+  background: color-mix(in srgb, var(--ion-color-success) 12%, var(--ion-card-background));
+  border-color: var(--ion-color-success);
+}
+
+.mt-tint-missed {
+  background: color-mix(in srgb, var(--ion-color-danger) 12%, var(--ion-card-background));
+  border-color: var(--ion-color-danger);
+}
+
+.mt-tint-upcoming {
+  background: color-mix(in srgb, var(--ion-color-medium) 10%, var(--ion-card-background));
+  border-color: var(--ion-color-medium);
+}
+
+.mt-tint-unknown {
+  background: var(--ion-card-background);
+  border-color: var(--ion-color-medium);
+  border-style: dashed;
+}
+
+.mt-stepper {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid var(--ion-border-color);
+  border-radius: 999px;
+  padding: 0 4px;
+}
+
+.mt-stepper-input {
+  width: 56px;
+  text-align: center;
+  font-weight: 600;
+}
+
+.mt-quantity {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: space-between;
+  margin-top: 8px;
+}
+
+.mt-dose-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  align-items: center;
+  column-gap: 8px;
+}
+
+.mt-empty {
+  text-align: center;
+  padding: 64px 24px;
+}

@@ -91,10 +91,8 @@ export default function DosesStep({ type, doses, errors, onChange }: DosesStepPr
 
   return (
     <>
-      <div style={{ padding: "16px 16px 0" }}>
-        <p style={{ margin: "0 0 8px", fontSize: 16, fontWeight: 700, color: "#111827" }}>
-          How many times a day?
-        </p>
+      <div className="mt-section">
+        <h3 className="mt-section-title">How many times a day?</h3>
         <IonSegment
           value={doses.length > 0 ? String(doses.length) : undefined}
           onIonChange={(event) => onChange(resizeDoses(doses, Number(event.detail.value), type))}
@@ -106,12 +104,12 @@ export default function DosesStep({ type, doses, errors, onChange }: DosesStepPr
           ))}
         </IonSegment>
         {errors.times && (
-          <IonNote color="danger" style={{ display: "block", paddingTop: 8 }}>
+          <IonNote color="danger" style={{ display: "block" }}>
             {errors.times}
           </IonNote>
         )}
         {errors.amounts && (
-          <IonNote color="danger" style={{ display: "block", paddingTop: 8 }}>
+          <IonNote color="danger" style={{ display: "block" }}>
             {errors.amounts}
           </IonNote>
         )}
@@ -133,7 +131,7 @@ export default function DosesStep({ type, doses, errors, onChange }: DosesStepPr
         ))}
       </IonList>
 
-      <div style={{ padding: "8px 16px" }}>
+      <div className="mt-section">
         <IonButton fill="clear" onClick={addDose} style={{ minHeight: 44 }}>
           <IonIcon slot="start" icon={addOutline} aria-hidden="true" />
           Add dose
